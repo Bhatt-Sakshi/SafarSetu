@@ -1912,7 +1912,7 @@ function updateCheckoutPriceBreakdown() {
 
   // Update pay button dynamic text
   if (payBtnLabel) {
-    payBtnLabel.textContent = `Pay ₹${total.toLocaleString()} with Razorpay`;
+    payBtnLabel.textContent = `Proceed to Pay ₹${total.toLocaleString()}`;
   }
 
   const multiplier = TourVerseState.user?.isPro || item.itemType === 'pro' ? 2 : 1;

@@ -2090,149 +2090,52 @@ function showSuccessModal(data) {
 window.showSuccessModal = showSuccessModal;
 
 /**
- * Official Razorpay Live Production Checkout Workflow
- * 1. Checks / injects Razorpay SDK if not present.
- * 2. Fetches keyId and creates order on SafarSetu server.
- * 3. Launches official window.Razorpay modal with keyId and orderData.
- * 4. Verifies payment signature at /api/payments/verify.
- * 5. Calls showSuccessModal(data) upon successful verification.
+ * Original Standard Razorpay Client-Side Checkout Workflow
+ * Triggers standard Razorpay client-side modal with key: "rzp_test_placeholder".
  */
-async function executePaymentGatewayFlow() {
-  const item = TourVerseState.activeCheckoutItem;
-  if (!item || !TourVerseState.user) {
-    showToast('Please sign in to complete your reservation', 'danger');
-    window.location.hash = '#auth';
+function executePaymentGatewayFlow() {
+  const item = TourVerseState.activeCheckoutItem || {};
+
+  // Calculate final payable amount based on current breakdown
+  const basePrice = item.basePrice || 3500;
+  const offPeakDiscount = item.discountSaved || 0;
+  const slider = document.getElementById('checkout-token-slider');
+  const tokensUsed = slider ? (parseInt(slider.value) || 0) : (item.tokensUsed || 0);
+  const tokenDiscount = tokensUsed * 2;
+  const subtotal = Math.max(0, basePrice - offPeakDiscount - tokenDiscount);
+  const taxRate = item.taxRate || (item.itemType === 'pro' ? 0.18 : 0.05);
+  const taxes = Math.round(subtotal * taxRate);
+  const finalPayableAmount = item.finalPayable || (subtotal + taxes) || 3500;
+
+  const options = {
+    key: "rzp_test_placeholder",
+    amount: Math.round(finalPayableAmount * 100),
+    currency: "INR",
+    name: "SafarSetu",
+    description: "Eco-Friendly Tourism & Stay Reservation",
+    image: "https://cdn-icons-png.flaticon.com/512/201/201623.png",
+    handler: function (response) {
+      alert("Payment successful! ID: " + response.razorpay_payment_id);
+    },
+    prefill: {
+      name: "Demo Tourist",
+      email: "tourist@safarsetu.com",
+      contact: "9999999999"
+    },
+    theme: {
+      color: "#059669"
+    }
+  };
+  const Razorpay = window.Razorpay || (typeof globalThis.Razorpay !== 'undefined' ? globalThis.Razorpay : null);
+  if (!Razorpay) {
+    alert("Oops! Something went wrong.\nPayment Failed");
     return;
   }
-
-  // Pre-check or dynamically inject script
-  if (typeof window.Razorpay !== 'function') {
-    await ensureRazorpayScriptLoaded();
-  }
-
-  const dates = document.getElementById('checkout-date-input')?.value || 'Flexible';
-  const guests = item.itemType === 'pro' ? 1 : (parseInt(document.getElementById('checkout-guests-input')?.value) || 1);
-  const tokensUsed = item.tokensUsed || 0;
-
-  const payBtn = document.getElementById('btn-trigger-payment-flow');
-  const payBtnLabel = document.getElementById('btn-pay-text-label');
-  const originalLabel = payBtnLabel ? payBtnLabel.textContent : 'Pay with Razorpay';
-
-  if (payBtn) payBtn.disabled = true;
-  if (payBtnLabel) payBtnLabel.textContent = 'Contacting Razorpay Gateway...';
-
-  try {
-    // a. Fetch the keyId from /api/config/razorpay-key
-    let keyId = null;
-    try {
-      const cfgRes = await fetch('/api/config/razorpay-key');
-      if (cfgRes.ok) {
-        const cfgData = await cfgRes.json();
-        if (cfgData && cfgData.keyId) {
-          keyId = cfgData.keyId;
-        }
-      }
-    } catch (cfgErr) {
-      console.warn('Could not pre-fetch keyId from /api/config/razorpay-key:', cfgErr);
-    }
-
-    // Call server order creation route
-    const orderRes = await fetch('/api/payments/create-order', {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify({
-        itemType: item.itemType,
-        title: item.title,
-        destination: TourVerseState.currentDestination?.name || 'Manali',
-        dateRange: dates,
-        guests: guests,
-        basePrice: item.basePrice,
-        discountSaved: item.discountSaved,
-        tokensUsed: tokensUsed,
-        meta: item.meta
-      })
-    });
-
-    const orderJson = await orderRes.json();
-    if (!orderRes.ok || !orderJson.success) {
-      throw new Error(orderJson.message || 'Server failed to calculate price and initialize order.');
-    }
-
-    const orderData = orderJson.data || orderJson;
-    if (!keyId) {
-      keyId = orderJson.keyId || orderData.keyId;
-    }
-
-    // b. Check if window.Razorpay is defined. If it's not defined, dynamically inject before failing.
-    if (typeof window.Razorpay !== 'function') {
-      const loaded = await ensureRazorpayScriptLoaded();
-      if (!loaded || typeof window.Razorpay !== 'function') {
-        throw new Error('Razorpay Checkout SDK is not loaded. Please verify your internet connection.');
-      }
-    }
-
-    const currentUser = TourVerseState.user;
-
-    // d. Open the Razorpay modal
-    const rzp = new window.Razorpay({
-      key: keyId,
-      amount: orderData.amount,
-      currency: 'INR',
-      name: 'SafarSetu',
-      description: 'Eco-Travel Booking',
-      order_id: orderData.orderId,
-      handler: async function (response) {
-        try {
-          showToast('🔒 Verifying payment with SafarSetu security vault...', 'info');
-          // send response.razorpay_payment_id, response.razorpay_order_id, response.razorpay_signature to /api/payments/verify
-          const verifyRes = await fetch('/api/payments/verify', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${localStorage.getItem('token') || localStorage.getItem('safarsetu_jwt_token') || TourVerseState.authToken || ''}`
-            },
-            body: JSON.stringify(response)
-          });
-          const data = await verifyRes.json();
-          if (data.success) {
-            showSuccessModal(data);
-          } else {
-            throw new Error(data.message || 'Payment signature verification failed.');
-          }
-        } catch (verifyErr) {
-          console.error('Signature verification error:', verifyErr);
-          showToast(`❌ Verification Error: ${verifyErr.message}`, 'danger');
-        }
-      },
-      prefill: {
-        name: currentUser?.name || 'Tourist',
-        email: currentUser?.email || 'tourist@safarsetu.com'
-      },
-      theme: { color: '#059669' },
-      modal: {
-        ondismiss: function () {
-          showToast('Razorpay payment cancelled.', 'info');
-          if (payBtn) payBtn.disabled = false;
-          if (payBtnLabel) payBtnLabel.textContent = originalLabel;
-        }
-      }
-    });
-
-    rzp.on('payment.failed', function (failResp) {
-      console.error('Razorpay payment failed:', failResp.error);
-      showToast(`⚠️ Payment Failed: ${failResp.error.description || failResp.error.reason}`, 'danger');
-      if (payBtn) payBtn.disabled = false;
-      if (payBtnLabel) payBtnLabel.textContent = originalLabel;
-    });
-
-    rzp.open();
-  } catch (err) {
-    console.error('Razorpay checkout trigger error:', err);
-    showToast(`⚠️ Checkout Error: ${err.message}`, 'danger');
-  } finally {
-    if (payBtn) payBtn.disabled = false;
-    if (payBtnLabel) payBtnLabel.textContent = originalLabel;
-  }
+  const rzp = new Razorpay(options);
+  rzp.on('payment.failed', function (response) {
+    alert("Oops! Something went wrong.\nPayment Failed");
+  });
+  rzp.open();
 }
 
 /**

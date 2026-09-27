@@ -2084,7 +2084,19 @@ async function computeBrowserHmacSha256(secret, message) {
 }
 
 /**
+ * Helper to determine if real live/test Razorpay API keys are configured
+ */
+function isRealRazorpayKey(keyId) {
+  if (!keyId || typeof keyId !== 'string') return false;
+  const k = keyId.trim();
+  if (k.startsWith('rzp_test_placeholder') || k.startsWith('rzp_live_placeholder')) return false;
+  if (k === 'rzp_test_SafarSetu2026Key' || k.includes('placeholder') || k.includes('YourKeyHere') || k.includes('dummy')) return false;
+  return /^rzp_(test|live)_[A-Za-z0-9]{10,}$/.test(k);
+}
+
+/**
  * Production-Grade Razorpay Payment Integration & Verification Workflow
+ * with Built-In Automatic Fallback / Sandbox Simulation Mode
  */
 async function executePaymentGatewayFlow() {
   const item = TourVerseState.activeCheckoutItem;
@@ -2105,7 +2117,7 @@ async function executePaymentGatewayFlow() {
   const tokensUsed = item.tokensUsed || 0;
 
   // Determine user-selected payment method label
-  let payMethodLabel = 'Razorpay Standard (UPI, Cards, Netbanking)';
+  let payMethodLabel = 'UPI / NetBanking';
   if (TourVerseState.selectedPaymentMethod === 'upi') {
     const upiId = document.getElementById('checkout-upi-id-input')?.value || 'aarav@oksbi';
     payMethodLabel = `UPI (${upiId})`;
@@ -2148,10 +2160,12 @@ async function executePaymentGatewayFlow() {
     return;
   }
 
-  // 2. Launch Official Razorpay Standard Checkout iframe if SDK is loaded
-  if (typeof window.Razorpay === 'function') {
+  // 2. Check if real live Razorpay credentials exist or if running in Demo/Sandbox mode
+  const hasRealKeys = isRealRazorpayKey(orderData.keyId) && !orderData.isSandbox && !orderData.sandboxMode;
+
+  if (hasRealKeys && typeof window.Razorpay === 'function') {
     const rzpOptions = {
-      key: orderData.keyId || 'rzp_test_SafarSetu2026Key',
+      key: orderData.keyId,
       amount: orderData.amount, // in paise
       currency: orderData.currency || 'INR',
       name: 'SafarSetu — Discover the Soul of India',
@@ -2193,47 +2207,56 @@ async function executePaymentGatewayFlow() {
     try {
       const rzp = new window.Razorpay(rzpOptions);
       rzp.on('payment.failed', function (resp) {
-        showToast(`⚠️ Payment failed: ${resp.error ? resp.error.description : 'Transaction cancelled'}`, 'danger');
+        showToast(`⚠️ Payment cancelled or failed: ${resp.error ? resp.error.description : 'Transaction cancelled'}`, 'danger');
       });
       rzp.open();
       return;
     } catch (rzpErr) {
-      console.warn('Razorpay open notice, proceeding with verified processing:', rzpErr);
+      console.warn('Real Razorpay initialization notice, continuing with sandbox demo:', rzpErr);
+      // Fall through to demo simulation
     }
   }
 
-  // Fallback / Simulated Interactive Processing when tested in sandbox without iframe
+  // 3. Built-In Animated Demo / Sandbox Mode Processing (2-second spinner)
   setCheckoutModalStep('processing');
+  const titleEl = document.getElementById('checkout-processing-title');
   const subtextEl = document.getElementById('checkout-processing-subtext');
   const barEl = document.getElementById('checkout-processing-bar');
 
-  if (barEl) barEl.style.width = '25%';
-  if (subtextEl) subtextEl.textContent = 'Contacting Razorpay Secure Gateway...';
+  if (titleEl) titleEl.textContent = 'Processing secure demo payment with UPI / NetBanking...';
+  if (barEl) barEl.style.width = '20%';
+  if (subtextEl) subtextEl.textContent = 'Contacting secure bank handshake & verifying sandbox token...';
 
-  await new Promise(r => setTimeout(r, 600));
-  if (barEl) barEl.style.width = '65%';
-  if (subtextEl) subtextEl.textContent = 'Verifying 2FA authorization token & HMAC signature...';
+  // 2-second animated spinner / progress meter
+  await new Promise(r => setTimeout(r, 650));
+  if (barEl) barEl.style.width = '60%';
+  if (subtextEl) subtextEl.textContent = 'Authorizing 256-bit simulated token & clearing instant reservation...';
+
+  await new Promise(r => setTimeout(r, 700));
+  if (barEl) barEl.style.width = '95%';
+  if (subtextEl) subtextEl.textContent = 'Saving booking in SQLite database vault and awarding Eco-Tokens...';
 
   await new Promise(r => setTimeout(r, 650));
-  if (barEl) barEl.style.width = '95%';
-  if (subtextEl) subtextEl.textContent = 'Recording reservation in database vault & awarding Eco-Tokens...';
-
-  await new Promise(r => setTimeout(r, 550));
   if (barEl) barEl.style.width = '100%';
 
-  const simPaymentId = `pay_sim_${Date.now().toString(36)}_${Math.random().toString(36).substring(2, 6)}`;
-  const textToSign = `${orderData.orderId}|${simPaymentId}`;
-  const validSignature = await computeBrowserHmacSha256('safarsetu_razorpay_secret_key_2026', textToSign);
+  const mockPaymentId = `pay_demo_success_${Date.now().toString(36)}_${Math.random().toString(36).substring(2, 6)}`;
+  const textToSign = `${orderData.orderId}|${mockPaymentId}`;
+  let validSignature = 'sig_demo_success';
+  try {
+    validSignature = await computeBrowserHmacSha256('safarsetu_razorpay_secret_key_2026', textToSign);
+  } catch (e) {
+    validSignature = 'sig_demo_success';
+  }
 
   await completePaymentVerification({
     razorpay_order_id: orderData.orderId,
-    razorpay_payment_id: simPaymentId,
-    razorpay_signature: validSignature,
+    razorpay_payment_id: mockPaymentId,
+    razorpay_signature: validSignature || 'sig_demo_success',
     item,
     dates,
     guests,
     tokensUsed,
-    payMethodLabel
+    payMethodLabel: `${payMethodLabel} (Demo Sandbox Verified)`
   });
 }
 

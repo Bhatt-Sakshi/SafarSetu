@@ -2170,126 +2170,269 @@ h1, h2, h3, h4, h5, h6 {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* UPI Payment Styles */
-.upi-content-grid {
+/* Interactive Payment Method Tiles Grid */
+.payment-method-tiles-grid {
   display: grid;
-  grid-template-columns: 170px 1fr;
-  gap: 1.2rem;
-  background: var(--bg-secondary);
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.65rem;
+  margin-bottom: 0.85rem;
+}
+
+.payment-method-tile {
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  padding: 1.2rem;
-  align-items: center;
+  padding: 0.7rem 0.8rem;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  user-select: none;
 }
 
-.qr-card-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.6rem;
+.payment-method-tile:hover {
+  border-color: rgba(16, 185, 129, 0.45);
+  background: rgba(16, 185, 129, 0.04);
+  transform: translateY(-2px);
 }
 
-.qr-white-frame {
-  background: #ffffff;
-  padding: 0.6rem;
-  border-radius: var(--radius-md);
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
-  width: 140px;
-  height: 140px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.payment-method-tile.active {
+  border: 2px solid var(--emerald) !important;
+  background: rgba(16, 185, 129, 0.09) !important;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.28), inset 0 0 12px rgba(16, 185, 129, 0.06);
 }
 
-.qr-timer-pill {
+.payment-method-tile .tile-indicator {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--emerald);
+  box-shadow: 0 0 8px var(--emerald);
+  display: none;
+}
+
+.payment-method-tile.active .tile-indicator {
+  display: block;
+}
+
+/* Payment Method Panels */
+.payment-method-panel {
+  display: none;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.payment-method-panel.active {
+  display: block;
+}
+
+/* Dynamic Payment Inputs */
+.dynamic-payment-input {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.85rem;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  transition: all var(--transition-fast);
+}
+
+.dynamic-payment-input:focus {
+  outline: none;
+  border-color: var(--emerald);
+  box-shadow: 0 0 0 2px var(--emerald-subtle);
+}
+
+.dynamic-payment-input.font-mono {
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+}
+
+.dynamic-payment-select {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.85rem;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.dynamic-payment-select:focus {
+  outline: none;
+  border-color: var(--emerald);
+  box-shadow: 0 0 0 2px var(--emerald-subtle);
+}
+
+/* UPI Quick Select Chips */
+.upi-quick-chip {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: 0.74rem;
-  font-family: var(--font-mono);
-  color: var(--amber);
-  background: rgba(245, 158, 11, 0.12);
-  border: 1px solid rgba(245, 158, 11, 0.3);
-  padding: 0.2rem 0.55rem;
-  border-radius: var(--radius-full);
-  font-weight: 700;
-}
-
-.upi-app-badges {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin-bottom: 0.9rem;
-}
-
-.upi-app-chip {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 0.75rem;
-  border-radius: var(--radius-sm);
-  background: var(--bg-card);
+  padding: 0.35rem 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-subtle);
-  font-size: 0.8rem;
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
   font-weight: 600;
   color: var(--text-secondary);
   cursor: pointer;
   transition: all var(--transition-fast);
 }
 
-.upi-app-chip:hover, .upi-app-chip.selected {
+.upi-quick-chip:hover {
+  background: rgba(16, 185, 129, 0.08);
   border-color: var(--emerald);
+  color: var(--text-primary);
+}
+
+.upi-quick-chip.active {
   background: var(--emerald-subtle);
-  color: var(--text-primary);
-}
-
-.upi-id-input-group {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.upi-id-input {
-  flex: 1;
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  padding: 0.55rem 0.75rem;
-  font-size: 0.88rem;
-  color: var(--text-primary);
-  font-family: var(--font-mono);
-}
-
-.upi-id-input:focus {
-  outline: none;
   border-color: var(--emerald);
-  box-shadow: 0 0 0 2px var(--emerald-subtle);
+  color: var(--emerald);
+  font-weight: 700;
 }
 
-.upi-verify-btn {
-  padding: 0.55rem 0.9rem;
-  font-size: 0.82rem;
-  font-weight: 700;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-primary);
+.upi-verify-chip-btn {
+  padding: 0.6rem 0.95rem;
+  background: var(--emerald-subtle);
+  border: 1px solid var(--emerald);
+  color: var(--emerald);
   border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+}
+
+.upi-verify-chip-btn:hover {
+  background: var(--emerald);
+  color: #ffffff;
+}
+
+/* QR Toggle Button */
+.qr-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
   cursor: pointer;
   transition: all var(--transition-fast);
 }
 
-.upi-verify-btn:hover {
-  background: var(--emerald);
+.qr-toggle-btn:hover {
+  background: var(--emerald-subtle);
   border-color: var(--emerald);
+  color: var(--emerald);
 }
 
-.upi-verify-status {
-  font-size: 0.76rem;
-  color: var(--sage);
-  margin-top: 0.35rem;
-  display: none;
+/* Simulated QR Graphic Card */
+.qr-graphic-card {
+  position: relative;
+  display: inline-block;
+  padding: 0.6rem;
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 16px rgba(16, 185, 129, 0.2);
+  overflow: hidden;
+}
+
+.qr-scan-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--emerald), transparent);
+  box-shadow: 0 0 8px var(--emerald);
+  animation: qrScanMove 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes qrScanMove {
+  0% { top: 4px; }
+  100% { top: calc(100% - 6px); }
+}
+
+/* Card Brand Badge */
+.card-network-badge {
+  display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--emerald);
+}
+
+/* Net Banking Bank Chips */
+.netbanking-bank-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
   font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.netbanking-bank-chip:hover {
+  border-color: var(--emerald);
+  color: var(--text-primary);
+  background: rgba(16, 185, 129, 0.05);
+}
+
+.netbanking-bank-chip.active {
+  border-color: var(--emerald);
+  background: var(--emerald-subtle);
+  color: var(--emerald);
+  font-weight: 700;
+}
+
+/* Wallet Select Chips */
+.wallet-select-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.6rem 0.8rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: left;
+}
+
+.wallet-select-chip:hover {
+  border-color: rgba(16, 185, 129, 0.4);
+  background: rgba(16, 185, 129, 0.04);
+}
+
+.wallet-select-chip.active {
+  border: 2px solid var(--emerald) !important;
+  background: rgba(16, 185, 129, 0.09) !important;
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.22);
 }
 
 /* Card Form Styles */

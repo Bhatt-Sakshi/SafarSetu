@@ -1043,38 +1043,319 @@
             </div>
           </div>
 
-          <div
+          <!-- Interactive Payment Method Tiles -->
+          <div class="payment-method-tiles-grid"
             style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.6rem; margin-bottom: 0.8rem;">
-            <div
-              style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 0.6rem 0.75rem;">
-              <div style="font-size: 1.1rem; margin-bottom: 0.2rem;">📱</div>
+            <!-- UPI Tile (Default selected) -->
+            <div class="payment-method-tile active" data-method="upi" id="tile-method-upi">
+              <div class="tile-indicator"></div>
+              <div style="font-size: 1.15rem; margin-bottom: 0.2rem;">📱</div>
               <div style="font-weight: 700; font-size: 0.82rem; color: var(--text-primary);">UPI & QR Code</div>
-              <div style="font-size: 0.7rem; color: var(--text-muted);">GPay, PhonePe, Paytm, BHIM</div>
+              <div style="font-size: 0.7rem; color: var(--text-muted);">GPay, PhonePe, Paytm</div>
             </div>
-            <div
-              style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 0.6rem 0.75rem;">
-              <div style="font-size: 1.1rem; margin-bottom: 0.2rem;">💳</div>
+            <!-- Cards Tile -->
+            <div class="payment-method-tile" data-method="card" id="tile-method-card">
+              <div class="tile-indicator"></div>
+              <div style="font-size: 1.15rem; margin-bottom: 0.2rem;">💳</div>
               <div style="font-weight: 700; font-size: 0.82rem; color: var(--text-primary);">Cards</div>
               <div style="font-size: 0.7rem; color: var(--text-muted);">Visa, MasterCard, RuPay</div>
             </div>
-            <div
-              style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 0.6rem 0.75rem;">
-              <div style="font-size: 1.1rem; margin-bottom: 0.2rem;">🏦</div>
+            <!-- Net Banking Tile -->
+            <div class="payment-method-tile" data-method="netbanking" id="tile-method-netbanking">
+              <div class="tile-indicator"></div>
+              <div style="font-size: 1.15rem; margin-bottom: 0.2rem;">🏦</div>
               <div style="font-weight: 700; font-size: 0.82rem; color: var(--text-primary);">Net Banking</div>
               <div style="font-size: 0.7rem; color: var(--text-muted);">50+ Scheduled Banks</div>
             </div>
-            <div
-              style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 0.6rem 0.75rem;">
-              <div style="font-size: 1.1rem; margin-bottom: 0.2rem;">👛</div>
+            <!-- Wallets & EMI Tile -->
+            <div class="payment-method-tile" data-method="wallet" id="tile-method-wallet">
+              <div class="tile-indicator"></div>
+              <div style="font-size: 1.15rem; margin-bottom: 0.2rem;">👛</div>
               <div style="font-weight: 700; font-size: 0.82rem; color: var(--text-primary);">Wallets & EMI</div>
-              <div style="font-size: 0.7rem; color: var(--text-muted);">Airtel, MobiKwik, PayLater</div>
+              <div style="font-size: 0.7rem; color: var(--text-muted);">Paytm, PhonePe, Amazon</div>
             </div>
           </div>
 
+          <!-- Dynamic Payment Input Details Container -->
+          <div id="payment-dynamic-details"
+            style="margin-top: 0.8rem; border-top: 1px solid var(--border-subtle); padding-top: 0.85rem;">
+
+            <!-- Panel 1: UPI & QR Code -->
+            <div class="payment-method-panel active" id="panel-method-upi">
+              <div style="margin-bottom: 0.65rem;">
+                <label for="upi-vpa-input"
+                  style="display: block; font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.35rem;">
+                  Enter UPI ID / VPA
+                </label>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                  <div style="position: relative; flex: 1;">
+                    <span
+                      style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--emerald); font-weight: 800; font-size: 0.95rem;">@</span>
+                    <input type="text" id="upi-vpa-input" class="dynamic-payment-input" style="padding-left: 2rem;"
+                      placeholder="name@oksbi / name@paytm" value="tourist@okhdfcbank" autocomplete="off" />
+                  </div>
+                  <button type="button" id="btn-verify-upi" class="upi-verify-chip-btn">
+                    <span>✓</span> Verify
+                  </button>
+                </div>
+                <div id="upi-verify-feedback"
+                  style="font-size: 0.74rem; color: var(--emerald); margin-top: 0.3rem; display: flex; align-items: center; gap: 0.3rem;">
+                  <span>🟢</span> <span id="upi-verify-text">UPI ID verified & active: Aarav Sharma (HDFC Bank)</span>
+                </div>
+              </div>
+
+              <!-- Quick Select Chips: Google Pay, PhonePe, Paytm -->
+              <div style="margin-bottom: 0.8rem;">
+                <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 0.35rem; font-weight: 600;">
+                  QUICK SELECT UPI APP:
+                </div>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                  <button type="button" class="upi-quick-chip active" data-handle="@okhdfcbank" data-app="Google Pay">
+                    <span class="upi-chip-icon">⚡</span> Google Pay
+                  </button>
+                  <button type="button" class="upi-quick-chip" data-handle="@ybl" data-app="PhonePe">
+                    <span class="upi-chip-icon">🟣</span> PhonePe
+                  </button>
+                  <button type="button" class="upi-quick-chip" data-handle="@paytm" data-app="Paytm">
+                    <span class="upi-chip-icon">🔵</span> Paytm
+                  </button>
+                </div>
+              </div>
+
+              <!-- Scan QR Code Toggle & Box -->
+              <div
+                style="border: 1px dashed var(--border-subtle); border-radius: var(--radius-md); padding: 0.75rem; background: rgba(0, 0, 0, 0.15);">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 1.2rem;">📷</span>
+                    <div>
+                      <div style="font-weight: 700; font-size: 0.82rem; color: var(--text-primary);">Scan QR Code</div>
+                      <div style="font-size: 0.7rem; color: var(--text-muted);">Instant scan with camera or payment app</div>
+                    </div>
+                  </div>
+                  <button type="button" id="btn-toggle-qr-code" class="qr-toggle-btn">
+                    <span id="qr-toggle-icon">▼</span> <span id="qr-toggle-text">Show QR Code</span>
+                  </button>
+                </div>
+
+                <!-- Collapsible Simulated QR Container -->
+                <div id="upi-qr-box"
+                  style="display: none; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-subtle); text-align: center;">
+                  <div class="qr-graphic-card">
+                    <div class="qr-scan-line"></div>
+                    <svg viewBox="0 0 160 160" width="135" height="135" class="simulated-qr-svg">
+                      <rect width="160" height="160" fill="#ffffff" rx="8" />
+                      <!-- Top Left Target -->
+                      <rect x="14" y="14" width="38" height="38" fill="#111827" />
+                      <rect x="20" y="20" width="26" height="26" fill="#ffffff" />
+                      <rect x="26" y="26" width="14" height="14" fill="#059669" />
+                      <!-- Top Right Target -->
+                      <rect x="108" y="14" width="38" height="38" fill="#111827" />
+                      <rect x="114" y="20" width="26" height="26" fill="#ffffff" />
+                      <rect x="120" y="26" width="14" height="14" fill="#059669" />
+                      <!-- Bottom Left Target -->
+                      <rect x="14" y="108" width="38" height="38" fill="#111827" />
+                      <rect x="20" y="114" width="26" height="26" fill="#ffffff" />
+                      <rect x="26" y="120" width="14" height="14" fill="#059669" />
+                      <!-- Pixels -->
+                      <rect x="60" y="16" width="6" height="6" fill="#111827" />
+                      <rect x="72" y="16" width="12" height="6" fill="#111827" />
+                      <rect x="92" y="16" width="6" height="6" fill="#111827" />
+                      <rect x="64" y="28" width="8" height="6" fill="#111827" />
+                      <rect x="80" y="28" width="6" height="6" fill="#111827" />
+                      <rect x="60" y="40" width="14" height="6" fill="#111827" />
+                      <rect x="82" y="40" width="14" height="6" fill="#111827" />
+                      <rect x="16" y="60" width="18" height="6" fill="#111827" />
+                      <rect x="42" y="60" width="8" height="6" fill="#111827" />
+                      <rect x="20" y="74" width="6" height="12" fill="#111827" />
+                      <rect x="36" y="74" width="14" height="6" fill="#111827" />
+                      <rect x="16" y="92" width="24" height="6" fill="#111827" />
+                      <!-- Center Brand Badge -->
+                      <rect x="64" y="64" width="32" height="32" rx="6" fill="#059669" />
+                      <text x="80" y="86" font-size="18" text-anchor="middle" fill="#ffffff">🌿</text>
+                      <rect x="102" y="60" width="8" height="6" fill="#111827" />
+                      <rect x="118" y="60" width="24" height="6" fill="#111827" />
+                      <rect x="108" y="74" width="16" height="6" fill="#111827" />
+                      <rect x="132" y="74" width="14" height="12" fill="#111827" />
+                      <rect x="102" y="92" width="28" height="6" fill="#111827" />
+                      <rect x="60" y="104" width="12" height="6" fill="#111827" />
+                      <rect x="80" y="104" width="18" height="6" fill="#111827" />
+                      <rect x="64" y="118" width="24" height="6" fill="#111827" />
+                      <rect x="60" y="132" width="10" height="14" fill="#111827" />
+                      <rect x="78" y="132" width="20" height="6" fill="#111827" />
+                      <rect x="108" y="108" width="10" height="10" fill="#111827" />
+                      <rect x="126" y="108" width="18" height="6" fill="#111827" />
+                      <rect x="114" y="126" width="30" height="6" fill="#111827" />
+                      <rect x="108" y="138" width="16" height="8" fill="#111827" />
+                      <rect x="132" y="138" width="14" height="8" fill="#111827" />
+                    </svg>
+                  </div>
+                  <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-primary); margin-top: 0.4rem;">
+                    Scan with Google Pay, PhonePe, Paytm or BHIM
+                  </div>
+                  <div
+                    style="font-size: 0.72rem; color: var(--emerald); margin-top: 0.2rem; font-family: var(--font-mono);">
+                    ⏱️ Dynamic QR expires in: <span id="qr-timer-countdown" style="font-weight: 800;">04:59</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Panel 2: Cards -->
+            <div class="payment-method-panel" id="panel-method-card">
+              <div style="margin-bottom: 0.65rem;">
+                <div
+                  style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                  <label for="input-card-number"
+                    style="font-size: 0.78rem; font-weight: 700; color: var(--text-secondary);">
+                    Card Number (16 Digits)
+                  </label>
+                  <span id="card-network-badge" class="card-network-badge">
+                    <span id="card-brand-icon">💳</span> <span id="card-brand-name">RuPay / Visa</span>
+                  </span>
+                </div>
+                <div style="position: relative;">
+                  <input type="text" id="input-card-number" class="dynamic-payment-input font-mono"
+                    placeholder="4532 8912 3456 7890" maxlength="19" autocomplete="cc-number"
+                    value="4532 8912 3456 7890" />
+                  <span
+                    style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); font-size: 1rem; pointer-events: none;">🔒</span>
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.65rem;">
+                <div>
+                  <label for="input-card-expiry"
+                    style="display: block; font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.35rem;">
+                    Expiry (MM/YY)
+                  </label>
+                  <input type="text" id="input-card-expiry" class="dynamic-payment-input font-mono"
+                    placeholder="MM/YY" maxlength="5" value="08/29" autocomplete="cc-exp" />
+                </div>
+                <div>
+                  <label for="input-card-cvv"
+                    style="display: block; font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.35rem;">
+                    CVV (3 Digits)
+                  </label>
+                  <input type="password" id="input-card-cvv" class="dynamic-payment-input font-mono" placeholder="•••"
+                    maxlength="3" value="789" autocomplete="cc-csc" />
+                </div>
+              </div>
+
+              <div>
+                <label for="input-card-name"
+                  style="display: block; font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.35rem;">
+                  Cardholder Name
+                </label>
+                <input type="text" id="input-card-name" class="dynamic-payment-input" placeholder="Name on card"
+                  value="Aarav Sharma" autocomplete="cc-name" />
+              </div>
+            </div>
+
+            <!-- Panel 3: Net Banking -->
+            <div class="payment-method-panel" id="panel-method-netbanking">
+              <div style="margin-bottom: 0.65rem;">
+                <label for="netbanking-bank-select"
+                  style="display: block; font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.35rem;">
+                  Select Indian Bank
+                </label>
+                <select id="netbanking-bank-select" class="dynamic-payment-select">
+                  <option value="State Bank of India" selected>State Bank of India</option>
+                  <option value="HDFC Bank">HDFC Bank</option>
+                  <option value="ICICI Bank">ICICI Bank</option>
+                  <option value="Axis Bank">Axis Bank</option>
+                  <option value="Punjab National Bank">Punjab National Bank</option>
+                </select>
+              </div>
+
+              <!-- Popular Bank Quick Chips -->
+              <div style="margin-bottom: 0.5rem;">
+                <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 0.35rem; font-weight: 600;">
+                  QUICK BANK SELECT:
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 0.45rem;">
+                  <button type="button" class="netbanking-bank-chip active" data-bank="State Bank of India">
+                    <span>🏛️</span> SBI
+                  </button>
+                  <button type="button" class="netbanking-bank-chip" data-bank="HDFC Bank">
+                    <span>🏢</span> HDFC
+                  </button>
+                  <button type="button" class="netbanking-bank-chip" data-bank="ICICI Bank">
+                    <span>🏦</span> ICICI
+                  </button>
+                  <button type="button" class="netbanking-bank-chip" data-bank="Axis Bank">
+                    <span>🏧</span> Axis
+                  </button>
+                  <button type="button" class="netbanking-bank-chip" data-bank="Punjab National Bank">
+                    <span>🏛️</span> PNB
+                  </button>
+                </div>
+              </div>
+              <div
+                style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.4rem; display: flex; align-items: center; gap: 0.35rem;">
+                <span>ℹ️</span> Secure redirection to bank gateway with OTP two-factor authentication.
+              </div>
+            </div>
+
+            <!-- Panel 4: Wallets & EMI -->
+            <div class="payment-method-panel" id="panel-method-wallet">
+              <div style="margin-bottom: 0.65rem;">
+                <div
+                  style="font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.45rem;">
+                  Select Digital Wallet
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.55rem;"
+                  id="wallet-chips-container">
+                  <button type="button" class="wallet-select-chip active" data-wallet="Paytm Wallet">
+                    <span style="font-size: 1.15rem;">🔵</span>
+                    <div style="text-align: left;">
+                      <div style="font-weight: 700; font-size: 0.82rem; color: var(--text-primary);">Paytm Wallet</div>
+                      <div style="font-size: 0.68rem; color: var(--text-muted);">Instant 1-Click Pay</div>
+                    </div>
+                  </button>
+                  <button type="button" class="wallet-select-chip" data-wallet="PhonePe Wallet">
+                    <span style="font-size: 1.15rem;">🟣</span>
+                    <div style="text-align: left;">
+                      <div style="font-weight: 700; font-size: 0.82rem; color: var(--text-primary);">PhonePe Wallet</div>
+                      <div style="font-size: 0.68rem; color: var(--text-muted);">UPI Linked Wallet</div>
+                    </div>
+                  </button>
+                  <button type="button" class="wallet-select-chip" data-wallet="Amazon Pay">
+                    <span style="font-size: 1.15rem;">🟠</span>
+                    <div style="text-align: left;">
+                      <div style="font-weight: 700; font-size: 0.82rem; color: var(--text-primary);">Amazon Pay</div>
+                      <div style="font-size: 0.68rem; color: var(--text-muted);">Cashback Eligible</div>
+                    </div>
+                  </button>
+                  <button type="button" class="wallet-select-chip" data-wallet="Mobikwik">
+                    <span style="font-size: 1.15rem;">🟢</span>
+                    <div style="text-align: left;">
+                      <div style="font-weight: 700; font-size: 0.82rem; color: var(--text-primary);">Mobikwik</div>
+                      <div style="font-size: 0.68rem; color: var(--text-muted);">ZIP & SuperCash</div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label for="input-wallet-phone"
+                  style="display: block; font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.35rem;">
+                  Registered Mobile Number
+                </label>
+                <div style="position: relative;">
+                  <span
+                    style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.82rem; font-family: var(--font-mono);">+91</span>
+                  <input type="tel" id="input-wallet-phone" class="dynamic-payment-input font-mono"
+                    style="padding-left: 2.8rem;" placeholder="98765 43210" value="98765 43210" maxlength="10" />
+                </div>
+              </div>
+            </div>
+
+          </div>
+
           <div
-            style="font-size: 0.76rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; padding-top: 0.6rem; border-top: 1px solid var(--border-subtle);">
-            <span>🛡️</span> Clicking "Proceed to Pay" will launch the official Razorpay Checkout modal for authentic
-            payment processing.
+            style="font-size: 0.76rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; padding-top: 0.65rem; border-top: 1px solid var(--border-subtle); margin-top: 0.75rem;">
+            <span>🛡️</span> 100% End-to-End Encrypted via NPCI & RBI Certified Gateways.
           </div>
         </div>
 
@@ -1085,8 +1366,31 @@
           </button>
           <button class="btn-emerald-action" id="btn-trigger-payment-flow"
             style="flex: 1; justify-content: center; padding: 0.95rem; font-size: 1rem;" type="button">
-            <span>🔒</span> <span id="btn-pay-text-label">Proceed to Pay ₹3,308</span>
+            <span>🔒</span> <span id="btn-pay-text-label">Proceed to Pay ₹3,308 via UPI</span>
           </button>
+        </div>
+      </div>
+
+      <!-- STEP 2: REALISTIC BANKING PROCESSING OVERLAY -->
+      <div class="checkout-processing-view" id="checkout-processing-view" style="display: none;">
+        <div class="processing-lock-wrap">
+          <div class="processing-lock-ring"></div>
+          <div class="processing-lock-icon">🔒</div>
+        </div>
+        <h3 style="font-size: 1.35rem; font-weight: 800; margin-bottom: 0.4rem; color: var(--text-primary);"
+          id="processing-title">
+          Authenticating with banking network...
+        </h3>
+        <p style="font-size: 0.88rem; color: var(--text-secondary); max-width: 440px; margin: 0 auto 1.2rem auto;"
+          id="processing-desc">
+          Establishing encrypted 256-bit handshake with your selected payment provider. Please do not refresh.
+        </p>
+        <div class="processing-step-meter">
+          <div class="processing-step-bar" id="processing-step-bar" style="width: 25%;"></div>
+        </div>
+        <div
+          style="font-size: 0.78rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 0.4rem; margin-top: 0.8rem;">
+          <span>🛡️</span> Verified by NPCI & Reserve Bank of India
         </div>
       </div>
 

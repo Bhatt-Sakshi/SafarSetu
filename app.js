@@ -1782,14 +1782,10 @@ function scrollCarousel(trackId, amount) {
 
 /**
  * Realistic Multi-Step Checkout Gateway & Pricing Calculator
+/**
+ * Production Razorpay Checkout Gateway & Dynamic Pricing Calculator
  */
 function openBookingCheckoutModal(itemType, title, basePrice, discountSaved = 0, tokensAwarded = 60, meta = {}) {
-  // Clear any existing QR countdown timer
-  if (TourVerseState.checkoutQrInterval) {
-    clearInterval(TourVerseState.checkoutQrInterval);
-    TourVerseState.checkoutQrInterval = null;
-  }
-
   TourVerseState.activeCheckoutItem = {
     itemType,
     title,
@@ -1800,12 +1796,11 @@ function openBookingCheckoutModal(itemType, title, basePrice, discountSaved = 0,
     taxRate: itemType === 'pro' ? 0.18 : 0.05,
     meta
   };
-  TourVerseState.selectedPaymentMethod = 'upi';
 
   const modal = document.getElementById('modal-checkout');
   if (!modal) return;
 
-  // Reset to Step 1 (Order Review & Interactive Payment Methods)
+  // Reset to Step 1 (Order Review & Razorpay Launcher)
   setCheckoutModalStep('form');
 
   const titleEl = document.getElementById('modal-booking-title');
@@ -1858,12 +1853,6 @@ function openBookingCheckoutModal(itemType, title, basePrice, discountSaved = 0,
     walletMaxLabel.textContent = `Available: ${userTokens} Tokens (Max Redeem: ${maxRedeemable})`;
   }
 
-  // Reset Payment Method Tabs to UPI
-  switchPaymentTab('upi');
-
-  // Start 5-minute dynamic QR countdown
-  startCheckoutQrTimer();
-
   // Calculate pricing & refresh display
   updateCheckoutPriceBreakdown();
 
@@ -1872,83 +1861,10 @@ function openBookingCheckoutModal(itemType, title, basePrice, discountSaved = 0,
 
 function setCheckoutModalStep(step) {
   const formView = document.getElementById('checkout-form-view');
-  const processingView = document.getElementById('checkout-processing-view');
-  const upiApprovalView = document.getElementById('checkout-upi-approval-view');
-  const otpView = document.getElementById('checkout-otp-view');
   const successView = document.getElementById('checkout-success-view');
 
   if (formView) formView.style.display = step === 'form' ? 'block' : 'none';
-  if (processingView) processingView.style.display = step === 'processing' ? 'block' : 'none';
-  if (upiApprovalView) upiApprovalView.style.display = step === 'upi-approval' ? 'block' : 'none';
-  if (otpView) otpView.style.display = step === 'otp' ? 'block' : 'none';
   if (successView) successView.style.display = step === 'success' ? 'block' : 'none';
-}
-
-function startCheckoutQrTimer() {
-  if (TourVerseState.checkoutQrInterval) {
-    clearInterval(TourVerseState.checkoutQrInterval);
-  }
-  TourVerseState.checkoutQrSecondsLeft = 300; // 5 minutes
-
-  const timerEl = document.getElementById('checkout-qr-timer');
-  const renderTime = () => {
-    if (!timerEl) return;
-    const mins = Math.floor(TourVerseState.checkoutQrSecondsLeft / 60);
-    const secs = TourVerseState.checkoutQrSecondsLeft % 60;
-    timerEl.innerHTML = `<span>⏱️</span> <span>${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')} remaining</span>`;
-  };
-
-  renderTime();
-  TourVerseState.checkoutQrInterval = setInterval(() => {
-    TourVerseState.checkoutQrSecondsLeft--;
-    if (TourVerseState.checkoutQrSecondsLeft <= 0) {
-      clearInterval(TourVerseState.checkoutQrInterval);
-      TourVerseState.checkoutQrInterval = null;
-      if (timerEl) {
-        timerEl.innerHTML = `<span>⚠️</span> <span style="cursor:pointer; text-decoration: underline;" id="btn-refresh-qr">QR Expired (Click to Refresh)</span>`;
-        document.getElementById('btn-refresh-qr')?.addEventListener('click', () => {
-          startCheckoutQrTimer();
-          updateCheckoutPriceBreakdown();
-        });
-      }
-    } else {
-      renderTime();
-    }
-  }, 1000);
-}
-
-function switchPaymentTab(tabKey) {
-  TourVerseState.selectedPaymentMethod = tabKey;
-
-  const tabBtns = {
-    upi: document.getElementById('tab-btn-upi'),
-    card: document.getElementById('tab-btn-card'),
-    netbanking: document.getElementById('tab-btn-netbanking')
-  };
-
-  const panes = {
-    upi: document.getElementById('pane-pay-upi'),
-    card: document.getElementById('pane-pay-card'),
-    netbanking: document.getElementById('pane-pay-netbanking')
-  };
-
-  Object.keys(tabBtns).forEach(k => {
-    if (tabBtns[k]) {
-      if (k === tabKey) {
-        tabBtns[k].classList.add('active-tab');
-        tabBtns[k].setAttribute('aria-selected', 'true');
-      } else {
-        tabBtns[k].classList.remove('active-tab');
-        tabBtns[k].setAttribute('aria-selected', 'false');
-      }
-    }
-    if (panes[k]) {
-      if (k === tabKey) panes[k].classList.add('active-pane');
-      else panes[k].classList.remove('active-pane');
-    }
-  });
-
-  updateCheckoutPriceBreakdown();
 }
 
 function updateCheckoutPriceBreakdown() {
@@ -1980,7 +1896,6 @@ function updateCheckoutPriceBreakdown() {
   const totalEl = document.getElementById('breakdown-total-price');
   const rewardEl = document.getElementById('checkout-reward-preview');
   const payBtnLabel = document.getElementById('btn-pay-text-label');
-  const qrImg = document.getElementById('checkout-qr-img');
 
   if (baseEl) baseEl.textContent = `₹${basePrice.toLocaleString()}`;
   if (offPeakEl) offPeakEl.textContent = offPeakDiscount > 0 ? `- ₹${offPeakDiscount.toLocaleString()}` : '₹0';
@@ -1988,20 +1903,9 @@ function updateCheckoutPriceBreakdown() {
   if (taxesEl) taxesEl.textContent = `₹${taxes.toLocaleString()}`;
   if (totalEl) totalEl.textContent = `₹${total.toLocaleString()}`;
 
-  // Update dynamic QR code payload with exact rupee total
-  if (qrImg) {
-    const upiPayload = `upi://pay?pa=safarsetu@icici&pn=SafarSetu%20India&am=${total}&cu=INR&tn=${encodeURIComponent(item.title.substring(0, 20))}`;
-    qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(upiPayload)}`;
-  }
-
   // Update pay button dynamic text
   if (payBtnLabel) {
-    const methodNames = {
-      upi: 'via UPI',
-      card: 'via Card',
-      netbanking: 'via Net Banking'
-    };
-    payBtnLabel.textContent = `Pay ₹${total.toLocaleString()} ${methodNames[TourVerseState.selectedPaymentMethod] || 'Securely'}`;
+    payBtnLabel.textContent = `Pay ₹${total.toLocaleString()} with Razorpay`;
   }
 
   const multiplier = TourVerseState.user?.isPro || item.itemType === 'pro' ? 2 : 1;
@@ -2073,174 +1977,13 @@ function downloadReceiptFile(receipt) {
   showToast('📄 Tax Invoice downloaded successfully!', 'info');
 }
 
-// Web Crypto HMAC-SHA256 Helper for Sandbox/Simulated Signature Verification
-async function computeBrowserHmacSha256(secret, message) {
-  try {
-    const enc = new TextEncoder();
-    const key = await window.crypto.subtle.importKey(
-      'raw',
-      enc.encode(secret),
-      { name: 'HMAC', hash: 'SHA-256' },
-      false,
-      ['sign']
-    );
-    const signature = await window.crypto.subtle.sign('HMAC', key, enc.encode(message));
-    return Array.from(new Uint8Array(signature)).map(b => b.toString(16).padStart(2, '0')).join('');
-  } catch (e) {
-    return 'sig_' + Math.random().toString(36).substring(2, 15);
-  }
-}
-
 /**
- * Real Client-Side Input Validation for Checkout
- * Validates UPI VPA, Debit/Credit Card details, or NetBanking selection
- * before allowing user to proceed to the processing pipeline.
- */
-function validateCheckoutPaymentInputs() {
-  document.querySelectorAll('.checkout-validation-error').forEach(el => el.style.display = 'none');
-  document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
-
-  const method = TourVerseState.selectedPaymentMethod || 'upi';
-
-  if (method === 'upi') {
-    const upiInput = document.getElementById('checkout-upi-id-input');
-    const val = upiInput ? upiInput.value.trim() : '';
-    if (!val || !val.includes('@') || val.length < 5) {
-      if (upiInput) upiInput.classList.add('input-error');
-      const errEl = document.getElementById('upi-validation-error');
-      if (errEl) errEl.style.display = 'flex';
-      showToast('⚠️ Please enter a valid UPI VPA ID (e.g. name@oksbi)', 'danger');
-      if (upiInput) upiInput.focus();
-      return false;
-    }
-    return true;
-  }
-
-  if (method === 'card') {
-    const cardNumInput = document.getElementById('card-number-input');
-    const cardNameInput = document.getElementById('card-name-input');
-    const cardExpInput = document.getElementById('card-expiry-input');
-    const cardCvvInput = document.getElementById('card-cvv-input');
-
-    const cardNum = cardNumInput ? cardNumInput.value.replace(/\D/g, '') : '';
-    const cardName = cardNameInput ? cardNameInput.value.trim() : '';
-    const cardExp = cardExpInput ? cardExpInput.value.trim() : '';
-    const cardCvv = cardCvvInput ? cardCvvInput.value.replace(/\D/g, '') : '';
-
-    if (!cardNum || cardNum.length < 15 || cardNum.length > 19) {
-      if (cardNumInput) {
-        cardNumInput.classList.add('input-error');
-        cardNumInput.focus();
-      }
-      showToast('⚠️ Please enter a valid 16-digit debit or credit card number', 'danger');
-      const errEl = document.getElementById('card-validation-error');
-      if (errEl) errEl.style.display = 'flex';
-      return false;
-    }
-
-    if (!cardName || cardName.length < 2) {
-      if (cardNameInput) {
-        cardNameInput.classList.add('input-error');
-        cardNameInput.focus();
-      }
-      showToast('⚠️ Please enter the cardholder name as printed on the card', 'danger');
-      const errEl = document.getElementById('card-validation-error');
-      if (errEl) errEl.style.display = 'flex';
-      return false;
-    }
-
-    const expMatch = cardExp.match(/^(0[1-9]|1[0-2])\/(\d{2})$/);
-    if (!expMatch) {
-      if (cardExpInput) {
-        cardExpInput.classList.add('input-error');
-        cardExpInput.focus();
-      }
-      showToast('⚠️ Expiration date must be in MM/YY format (e.g. 08/29)', 'danger');
-      const errEl = document.getElementById('card-validation-error');
-      if (errEl) errEl.style.display = 'flex';
-      return false;
-    }
-    const expYear = parseInt(expMatch[2], 10);
-    if (expYear < 26) {
-      if (cardExpInput) {
-        cardExpInput.classList.add('input-error');
-        cardExpInput.focus();
-      }
-      showToast('⚠️ Card has expired. Please use a valid unexpired card', 'danger');
-      const errEl = document.getElementById('card-validation-error');
-      if (errEl) errEl.style.display = 'flex';
-      return false;
-    }
-
-    if (!cardCvv || cardCvv.length < 3) {
-      if (cardCvvInput) {
-        cardCvvInput.classList.add('input-error');
-        cardCvvInput.focus();
-      }
-      showToast('⚠️ Please enter a valid 3-digit CVV security code', 'danger');
-      const errEl = document.getElementById('card-validation-error');
-      if (errEl) errEl.style.display = 'flex';
-      return false;
-    }
-
-    return true;
-  }
-
-  if (method === 'netbanking') {
-    const selectedRadio = document.querySelector('input[name="netbanking-bank"]:checked');
-    const dropdown = document.getElementById('bank-select-dropdown');
-    const bankName = (dropdown && dropdown.value) || (selectedRadio ? selectedRadio.value : '');
-
-    if (!bankName) {
-      const errEl = document.getElementById('netbanking-validation-error');
-      if (errEl) errEl.style.display = 'flex';
-      showToast('⚠️ Please select a bank to proceed with Net Banking', 'danger');
-      return false;
-    }
-    return true;
-  }
-
-  return true;
-}
-
-/**
- * Interactive Countdown Timer for UPI Approval Pipeline
- */
-function startUpiApprovalCountdown(onExpire) {
-  if (TourVerseState.upiApprovalInterval) {
-    clearInterval(TourVerseState.upiApprovalInterval);
-    TourVerseState.upiApprovalInterval = null;
-  }
-  let secondsLeft = 180; // 3 minutes
-
-  const timerTextEl = document.getElementById('upi-approval-timer-text');
-  const render = () => {
-    if (!timerTextEl) return;
-    const mins = Math.floor(secondsLeft / 60);
-    const secs = secondsLeft % 60;
-    timerTextEl.textContent = `Open your UPI app to approve request: ${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')} remaining`;
-  };
-
-  render();
-  TourVerseState.upiApprovalInterval = setInterval(() => {
-    secondsLeft--;
-    if (secondsLeft <= 0) {
-      clearInterval(TourVerseState.upiApprovalInterval);
-      TourVerseState.upiApprovalInterval = null;
-      if (timerTextEl) {
-        timerTextEl.textContent = 'Request timed out. Please try again.';
-      }
-      if (typeof onExpire === 'function') onExpire();
-    } else {
-      render();
-    }
-  }, 1000);
-}
-
-/**
- * Authentic, Self-Contained Banking & Payment Gateway Workflow
- * Completely independent of external merchant keys with interactive
- * 2-factor OTP and UPI approval pipelines.
+ * Official Razorpay Live Production Checkout Workflow
+ * 1. Calls POST /api/payments/create-order on SafarSetu server.
+ * 2. Invokes new Razorpay(options).open() to present the official Razorpay modal.
+ * 3. Handles SDK payment response inside options.handler.
+ * 4. Calls POST /api/payments/verify-signature for HMAC-SHA256 verification and SQLite persistence.
+ * 5. Displays verified digital receipt and updates user profile & bookings.
  */
 async function executePaymentGatewayFlow() {
   const item = TourVerseState.activeCheckoutItem;
@@ -2250,202 +1993,24 @@ async function executePaymentGatewayFlow() {
     return;
   }
 
-  // 1. Client-Side Input Validation
-  if (!validateCheckoutPaymentInputs()) {
-    return;
-  }
-
-  // Stop background timers
-  if (TourVerseState.checkoutQrInterval) {
-    clearInterval(TourVerseState.checkoutQrInterval);
-    TourVerseState.checkoutQrInterval = null;
-  }
-  if (TourVerseState.upiApprovalInterval) {
-    clearInterval(TourVerseState.upiApprovalInterval);
-    TourVerseState.upiApprovalInterval = null;
-  }
-
   const dates = document.getElementById('checkout-date-input')?.value || 'Flexible';
   const guests = item.itemType === 'pro' ? 1 : (parseInt(document.getElementById('checkout-guests-input')?.value) || 1);
   const tokensUsed = item.tokensUsed || 0;
-  const method = TourVerseState.selectedPaymentMethod || 'upi';
 
-  // Extract payment details based on method
-  let payMethodLabel = 'UPI / NetBanking';
-  let paymentDetails = { method };
+  const payBtn = document.getElementById('btn-trigger-payment-flow');
+  const payBtnLabel = document.getElementById('btn-pay-text-label');
+  const originalLabel = payBtnLabel ? payBtnLabel.textContent : 'Pay with Razorpay';
 
-  if (method === 'upi') {
-    const upiId = document.getElementById('checkout-upi-id-input')?.value.trim() || 'aarav@oksbi';
-    payMethodLabel = `UPI (${upiId})`;
-    paymentDetails.vpa = upiId;
-  } else if (method === 'card') {
-    const cardNum = document.getElementById('card-number-input')?.value.replace(/\s+/g, '') || '8921';
-    const last4 = cardNum.slice(-4) || '8921';
-    const cardBrand = cardNum.startsWith('4') ? 'Visa' : (cardNum.startsWith('5') ? 'MasterCard' : 'RuPay');
-    payMethodLabel = `${cardBrand} Card (ending in ${last4})`;
-    paymentDetails.brand = cardBrand;
-    paymentDetails.last4 = last4;
-  } else if (method === 'netbanking') {
-    const selectedRadio = document.querySelector('input[name="netbanking-bank"]:checked');
-    const dropdownBank = document.getElementById('bank-select-dropdown')?.value;
-    const bankName = dropdownBank || (selectedRadio ? selectedRadio.value : 'State Bank of India');
-    payMethodLabel = `Net Banking (${bankName})`;
-    paymentDetails.bank = bankName;
+  if (payBtn) {
+    payBtn.disabled = true;
+  }
+  if (payBtnLabel) {
+    payBtnLabel.textContent = 'Contacting Razorpay Gateway...';
   }
 
-  // STEP A: Realistic Secure Handshake Screen with rotating emerald lock spinner
-  setCheckoutModalStep('processing');
-  const titleEl = document.getElementById('checkout-processing-title');
-  const subtextEl = document.getElementById('checkout-processing-subtext');
-  const barEl = document.getElementById('checkout-processing-bar');
-
-  if (titleEl) titleEl.textContent = 'Contacting issuing bank via 256-bit SSL encryption...';
-  if (subtextEl) subtextEl.textContent = 'Establishing 256-bit encrypted handshake with your payment provider...';
-  if (barEl) barEl.style.width = '25%';
-
-  await new Promise(r => setTimeout(r, 650));
-  if (barEl) barEl.style.width = '65%';
-  if (subtextEl) subtextEl.textContent = 'Verifying account routing & generating secure transaction token...';
-
-  await new Promise(r => setTimeout(r, 600));
-  if (barEl) barEl.style.width = '90%';
-
-  // STEP B: Method-Specific Pipeline
-  if (method === 'upi') {
-    // Show UPI App Approval Screen
-    setCheckoutModalStep('upi-approval');
-    const vpaDisplay = document.getElementById('upi-approval-vpa-display');
-    const amountDisplay = document.getElementById('upi-approval-amount');
-    if (vpaDisplay) vpaDisplay.textContent = paymentDetails.vpa;
-    if (amountDisplay) amountDisplay.textContent = `₹${item.finalPayable.toLocaleString()}`;
-
-    startUpiApprovalCountdown(() => {
-      showToast('⚠️ UPI collect request timed out. Please try again.', 'danger');
-      setCheckoutModalStep('form');
-    });
-
-    // Wire UPI Approval simulation button
-    const approveBtn = document.getElementById('btn-simulate-upi-approve');
-    if (approveBtn) {
-      approveBtn.onclick = async () => {
-        if (TourVerseState.upiApprovalInterval) {
-          clearInterval(TourVerseState.upiApprovalInterval);
-          TourVerseState.upiApprovalInterval = null;
-        }
-
-        // Brief processing confirmation
-        setCheckoutModalStep('processing');
-        if (titleEl) titleEl.textContent = 'UPI Authorization Confirmed via NPCI...';
-        if (subtextEl) subtextEl.textContent = 'Finalizing booking vault transaction & crediting Eco-Tokens...';
-        if (barEl) barEl.style.width = '98%';
-        await new Promise(r => setTimeout(r, 550));
-
-        await submitPaymentCheckout({
-          item,
-          dates,
-          guests,
-          tokensUsed,
-          payMethodLabel,
-          paymentDetails
-        });
-      };
-    }
-
-    // Wire Cancel button
-    const cancelUpiBtn = document.getElementById('btn-cancel-upi-approval');
-    if (cancelUpiBtn) {
-      cancelUpiBtn.onclick = () => {
-        if (TourVerseState.upiApprovalInterval) {
-          clearInterval(TourVerseState.upiApprovalInterval);
-          TourVerseState.upiApprovalInterval = null;
-        }
-        setCheckoutModalStep('form');
-      };
-    }
-
-  } else {
-    // Card or NetBanking: Show 2-Factor Authentication (OTP) prompt
-    setCheckoutModalStep('otp');
-    const amountDisplay = document.getElementById('otp-approval-amount');
-    const otpInput = document.getElementById('checkout-otp-input');
-    const otpError = document.getElementById('otp-validation-error');
-
-    if (amountDisplay) amountDisplay.textContent = `₹${item.finalPayable.toLocaleString()}`;
-    if (otpInput) {
-      otpInput.value = '';
-      otpInput.classList.remove('input-error');
-      setTimeout(() => otpInput.focus(), 150);
-    }
-    if (otpError) otpError.style.display = 'none';
-
-    // Auto-fill demo OTP button
-    const autoFillBtn = document.getElementById('btn-autofill-otp');
-    if (autoFillBtn) {
-      autoFillBtn.onclick = () => {
-        if (otpInput) {
-          otpInput.value = '123456';
-          otpInput.classList.remove('input-error');
-          if (otpError) otpError.style.display = 'none';
-        }
-      };
-    }
-
-    // Submit OTP button
-    const submitOtpBtn = document.getElementById('btn-submit-otp');
-    if (submitOtpBtn) {
-      submitOtpBtn.onclick = async () => {
-        const otpVal = otpInput ? otpInput.value.replace(/\D/g, '') : '';
-        if (otpVal.length !== 6) {
-          if (otpInput) otpInput.classList.add('input-error');
-          if (otpError) otpError.style.display = 'flex';
-          showToast('⚠️ Please enter the 6-digit OTP sent to your phone (Demo: 123456)', 'danger');
-          if (otpInput) otpInput.focus();
-          return;
-        }
-
-        // Brief processing confirmation
-        setCheckoutModalStep('processing');
-        if (titleEl) titleEl.textContent = '3D Secure 2.0 OTP Verified by Issuing Bank...';
-        if (subtextEl) subtextEl.textContent = 'Securing instant reservation in SQLite database vault...';
-        if (barEl) barEl.style.width = '98%';
-        await new Promise(r => setTimeout(r, 600));
-
-        await submitPaymentCheckout({
-          item,
-          dates,
-          guests,
-          tokensUsed,
-          payMethodLabel,
-          paymentDetails: { ...paymentDetails, otpVerified: true }
-        });
-      };
-    }
-
-    // Cancel OTP button
-    const cancelOtpBtn = document.getElementById('btn-cancel-otp');
-    if (cancelOtpBtn) {
-      cancelOtpBtn.onclick = () => {
-        setCheckoutModalStep('form');
-      };
-    }
-  }
-}
-
-/**
- * Backend Submission & Persistence Route Execution:
- * Calls POST /api/payments/process-checkout with authenticated JWT session,
- * persists the reservation, updates Eco-Tokens, and displays green receipt screen.
- */
-async function submitPaymentCheckout({
-  item,
-  dates,
-  guests,
-  tokensUsed,
-  payMethodLabel,
-  paymentDetails
-}) {
   try {
-    const res = await fetch('/api/payments/process-checkout', {
+    // 1. Server-side Order Creation via Razorpay Orders API
+    const orderRes = await fetch('/api/payments/create-order', {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify({
@@ -2457,77 +2022,169 @@ async function submitPaymentCheckout({
         basePrice: item.basePrice,
         discountSaved: item.discountSaved,
         tokensUsed: tokensUsed,
-        paymentMethod: payMethodLabel,
-        paymentDetails: paymentDetails,
         meta: item.meta
       })
     });
 
-    const json = await res.json();
-    if (!res.ok || !json.success) {
-      throw new Error(json.message || 'Payment checkout processing rejected.');
+    const orderJson = await orderRes.json();
+    if (!orderRes.ok || !orderJson.success) {
+      throw new Error(orderJson.message || 'Server failed to calculate price and initialize Razorpay order.');
     }
 
-    const confirmedBooking = json.data?.booking;
-    if (json.data?.updatedWallet) {
-      TourVerseState.user.wallet = json.data.updatedWallet;
-    }
-    if (!TourVerseState.user.activeBookings) TourVerseState.user.activeBookings = [];
-    if (confirmedBooking) {
-      TourVerseState.user.activeBookings.unshift(confirmedBooking);
-    }
-    if (item.itemType === 'pro') {
-      TourVerseState.user.isPro = true;
+    const orderData = orderJson.data || orderJson;
+    const orderId = orderJson.orderId || orderData.orderId;
+    const amount = orderJson.amount || orderData.amount;
+    const currency = orderJson.currency || orderData.currency || 'INR';
+    const keyId = orderJson.keyId || orderData.keyId;
+
+    if (typeof window.Razorpay !== 'function') {
+      throw new Error('Razorpay Checkout SDK is not loaded. Please check your internet connection.');
     }
 
-    saveLocalUserFallback();
-    updateNavbarUserUI();
-    updateProfileDashboardUI();
+    // 2. Configure Official Razorpay Checkout Modal
+    const options = {
+      key: keyId,
+      amount: amount,
+      currency: currency,
+      name: 'SafarSetu',
+      description: `${item.title} (${item.itemType.toUpperCase()})`,
+      image: 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=128&q=80',
+      order_id: orderId,
+      handler: async function (response) {
+        console.log('✓ Razorpay payment response received:', response);
+        try {
+          showToast('🔒 Verifying payment signature with SafarSetu security vault...', 'info');
 
-    const timestampStr = json.date || new Date().toLocaleString('en-IN');
-    const transactionId = json.transactionId || `TXN_SETU_${Date.now()}`;
+          // 3. Cryptographic HMAC-SHA256 Signature Verification & SQLite Persistence
+          const verifyRes = await fetch('/api/payments/verify-signature', {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              itemType: item.itemType,
+              title: item.title,
+              destination: TourVerseState.currentDestination?.name || 'Manali',
+              dateRange: dates,
+              guests: guests,
+              basePrice: item.basePrice,
+              discountSaved: item.discountSaved,
+              tokensUsed: tokensUsed,
+              meta: item.meta
+            })
+          });
 
-    const receiptData = {
-      txnId: transactionId,
-      timestamp: timestampStr,
-      itemTitle: item.title,
-      itemType: item.itemType,
-      userName: TourVerseState.user.name,
-      userEmail: TourVerseState.user.email,
-      dates,
-      guests,
-      basePrice: item.basePrice,
-      discountSaved: item.discountSaved,
-      tokensUsed,
-      taxes: Math.round(json.amount - (item.basePrice - item.discountSaved - tokensUsed * 2)),
-      taxRate: item.taxRate || (item.itemType === 'pro' ? 0.18 : 0.05),
-      totalPaid: json.amount,
-      paymentMethod: payMethodLabel,
-      tokensAwarded: json.tokensEarned
+          const verifyJson = await verifyRes.json();
+          if (!verifyRes.ok || !verifyJson.success) {
+            throw new Error(verifyJson.message || 'Payment signature verification rejected.');
+          }
+
+          // 4. Update Client State & Persisted Profile
+          const confirmedBooking = verifyJson.data?.booking;
+          if (verifyJson.data?.updatedWallet) {
+            TourVerseState.user.wallet = verifyJson.data.updatedWallet;
+          }
+          if (!TourVerseState.user.activeBookings) TourVerseState.user.activeBookings = [];
+          if (confirmedBooking) {
+            TourVerseState.user.activeBookings.unshift(confirmedBooking);
+          }
+          if (item.itemType === 'pro') {
+            TourVerseState.user.isPro = true;
+          }
+
+          saveLocalUserFallback();
+          updateNavbarUserUI();
+          updateProfileDashboardUI();
+
+          // 5. Populate Digital Receipt Box
+          const timestampStr = verifyJson.date || new Date().toLocaleString('en-IN');
+          const paymentId = response.razorpay_payment_id;
+          const totalPaidRupees = Math.round(amount / 100);
+
+          const receiptData = {
+            txnId: paymentId,
+            orderId: orderId,
+            timestamp: timestampStr,
+            itemTitle: item.title,
+            itemType: item.itemType,
+            userName: TourVerseState.user.name,
+            userEmail: TourVerseState.user.email,
+            dates,
+            guests,
+            basePrice: item.basePrice,
+            discountSaved: item.discountSaved,
+            tokensUsed,
+            taxes: Math.round(totalPaidRupees - (item.basePrice - item.discountSaved - tokensUsed * 2)),
+            taxRate: item.taxRate || (item.itemType === 'pro' ? 0.18 : 0.05),
+            totalPaid: totalPaidRupees,
+            paymentMethod: `Razorpay (${paymentId})`,
+            tokensAwarded: verifyJson.tokensEarned || 120
+          };
+          TourVerseState.lastSuccessfulTransaction = receiptData;
+
+          const txnEl = document.getElementById('receipt-txn-id');
+          const orderEl = document.getElementById('receipt-order-id');
+          const timeEl = document.getElementById('receipt-timestamp');
+          const itemEl = document.getElementById('receipt-item-title');
+          const payMethodEl = document.getElementById('receipt-pay-method');
+          const tokenChangeEl = document.getElementById('receipt-token-change');
+          const totalPaidEl = document.getElementById('receipt-total-paid');
+
+          if (txnEl) txnEl.textContent = paymentId;
+          if (orderEl) orderEl.textContent = orderId;
+          if (timeEl) timeEl.textContent = timestampStr;
+          if (itemEl) itemEl.textContent = item.title;
+          if (payMethodEl) payMethodEl.textContent = `Official Razorpay (${paymentId})`;
+          if (tokenChangeEl) tokenChangeEl.textContent = `+${verifyJson.tokensEarned || 120} Tokens Awarded (-${tokensUsed} Redeemed)`;
+          if (totalPaidEl) totalPaidEl.textContent = `₹${totalPaidRupees.toLocaleString()}`;
+
+          setCheckoutModalStep('success');
+          triggerConfetti();
+          showToast(`🎉 Payment of ₹${totalPaidRupees.toLocaleString()} verified and booked via Razorpay!`, 'success');
+        } catch (verifyErr) {
+          console.error('Signature verification error:', verifyErr);
+          showToast(`❌ Verification Error: ${verifyErr.message}`, 'danger');
+        }
+      },
+      prefill: {
+        name: TourVerseState.user.name,
+        email: TourVerseState.user.email,
+        contact: '9876543210'
+      },
+      notes: {
+        booking_title: item.title,
+        item_type: item.itemType,
+        destination: TourVerseState.currentDestination?.name || 'Manali'
+      },
+      theme: {
+        color: '#10B981' // SafarSetu Emerald
+      },
+      modal: {
+        ondismiss: function () {
+          showToast('Razorpay payment cancelled.', 'info');
+          if (payBtn) payBtn.disabled = false;
+          if (payBtnLabel) payBtnLabel.textContent = originalLabel;
+        }
+      }
     };
-    TourVerseState.lastSuccessfulTransaction = receiptData;
 
-    const txnEl = document.getElementById('receipt-txn-id');
-    const timeEl = document.getElementById('receipt-timestamp');
-    const itemEl = document.getElementById('receipt-item-title');
-    const payMethodEl = document.getElementById('receipt-pay-method');
-    const tokenChangeEl = document.getElementById('receipt-token-change');
-    const totalPaidEl = document.getElementById('receipt-total-paid');
+    // 6. Open the official Razorpay Checkout modal
+    const rzp = new window.Razorpay(options);
+    rzp.on('payment.failed', function (failResp) {
+      console.error('Razorpay payment failed:', failResp.error);
+      showToast(`⚠️ Payment Failed: ${failResp.error.description || failResp.error.reason}`, 'danger');
+      if (payBtn) payBtn.disabled = false;
+      if (payBtnLabel) payBtnLabel.textContent = originalLabel;
+    });
 
-    if (txnEl) txnEl.textContent = transactionId;
-    if (timeEl) timeEl.textContent = timestampStr;
-    if (itemEl) itemEl.textContent = item.title;
-    if (payMethodEl) payMethodEl.textContent = payMethodLabel;
-    if (tokenChangeEl) tokenChangeEl.textContent = `+${json.tokensEarned} Tokens Awarded (-${tokensUsed} Redeemed)`;
-    if (totalPaidEl) totalPaidEl.textContent = `₹${json.amount.toLocaleString()}`;
-
-    setCheckoutModalStep('success');
-    triggerConfetti();
-    showToast(`🎉 Payment of ₹${json.amount.toLocaleString()} confirmed via ${payMethodLabel}!`, 'success');
+    rzp.open();
   } catch (err) {
-    console.error('Payment checkout error:', err);
-    showToast(`⚠️ Payment Processing Error: ${err.message}`, 'danger');
-    setCheckoutModalStep('form');
+    console.error('Razorpay checkout trigger error:', err);
+    showToast(`⚠️ Checkout Error: ${err.message}`, 'danger');
+  } finally {
+    if (payBtn) payBtn.disabled = false;
+    if (payBtnLabel) payBtnLabel.textContent = originalLabel;
   }
 }
 
@@ -2854,103 +2511,7 @@ function initModalsAndEvents() {
   document.getElementById('modal-checkout-close')?.addEventListener('click', handleCloseCheckout);
   document.getElementById('btn-cancel-checkout')?.addEventListener('click', handleCloseCheckout);
 
-  // Payment Gateway Tab Triggers
-  document.getElementById('tab-btn-upi')?.addEventListener('click', () => switchPaymentTab('upi'));
-  document.getElementById('tab-btn-card')?.addEventListener('click', () => switchPaymentTab('card'));
-  document.getElementById('tab-btn-netbanking')?.addEventListener('click', () => switchPaymentTab('netbanking'));
-
-  // Quick UPI App Badges
-  document.querySelectorAll('.upi-app-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      document.querySelectorAll('.upi-app-chip').forEach(c => c.classList.remove('selected'));
-      chip.classList.add('selected');
-      const app = chip.getAttribute('data-app');
-      const upiInput = document.getElementById('checkout-upi-id-input');
-      const userName = (TourVerseState.user?.name || 'aarav').toLowerCase().replace(/\s+/g, '');
-      if (upiInput) {
-        if (app === 'gpay') upiInput.value = `${userName}@oksbi`;
-        else if (app === 'phonepe') upiInput.value = `${userName}@ybl`;
-        else if (app === 'paytm') upiInput.value = `${userName}@paytm`;
-        else if (app === 'bhim') upiInput.value = `${userName}@upi`;
-      }
-    });
-  });
-
-  // UPI ID Verification
-  document.getElementById('btn-verify-upi-id')?.addEventListener('click', () => {
-    const upiInput = document.getElementById('checkout-upi-id-input');
-    const feedback = document.getElementById('upi-verify-feedback');
-    const val = upiInput?.value.trim() || '';
-    if (!val.includes('@')) {
-      showToast('Please enter a valid UPI VPA (e.g. name@upi)', 'danger');
-      return;
-    }
-    if (feedback) {
-      feedback.style.display = 'flex';
-      feedback.innerHTML = `<span>✓</span> Verified: ${TourVerseState.user?.name || 'Aarav Sharma'} (Active UPI Node)`;
-    }
-    showToast('✓ UPI ID successfully verified with NPCI directory!', 'success');
-  });
-
-  // Credit / Debit Card Input Auto-formatting
-  const cardNumInput = document.getElementById('card-number-input');
-  if (cardNumInput) {
-    cardNumInput.addEventListener('input', (e) => {
-      let val = e.target.value.replace(/\D/g, '').substring(0, 16);
-      let formatted = val.match(/.{1,4}/g)?.join(' ') || val;
-      e.target.value = formatted;
-      const brandBadge = document.getElementById('card-brand-badge');
-      if (brandBadge) {
-        if (val.startsWith('4')) brandBadge.textContent = '💳 Visa Verified';
-        else if (val.startsWith('5')) brandBadge.textContent = '💳 MasterCard Verified';
-        else if (val.startsWith('6') || val.startsWith('3')) brandBadge.textContent = '💳 RuPay Verified';
-        else brandBadge.textContent = '💳 Visa / MasterCard / RuPay';
-      }
-    });
-  }
-
-  const cardExpInput = document.getElementById('card-expiry-input');
-  if (cardExpInput) {
-    cardExpInput.addEventListener('input', (e) => {
-      let val = e.target.value.replace(/\D/g, '').substring(0, 4);
-      if (val.length >= 2) val = val.substring(0, 2) + '/' + val.substring(2);
-      e.target.value = val;
-    });
-  }
-
-  const cardCvvInput = document.getElementById('card-cvv-input');
-  if (cardCvvInput) {
-    cardCvvInput.addEventListener('input', (e) => {
-      e.target.value = e.target.value.replace(/\D/g, '').substring(0, 4);
-    });
-  }
-
-  // Net Banking Radio & Dropdown selection
-  document.querySelectorAll('.bank-radio-card').forEach(card => {
-    card.addEventListener('click', () => {
-      document.querySelectorAll('.bank-radio-card').forEach(c => c.classList.remove('selected'));
-      card.classList.add('selected');
-      const radio = card.querySelector('input[type="radio"]');
-      if (radio) radio.checked = true;
-      const dropdown = document.getElementById('bank-select-dropdown');
-      if (dropdown) dropdown.value = '';
-    });
-  });
-
-  const bankDropdown = document.getElementById('bank-select-dropdown');
-  if (bankDropdown) {
-    bankDropdown.addEventListener('change', () => {
-      if (bankDropdown.value) {
-        document.querySelectorAll('.bank-radio-card').forEach(c => {
-          c.classList.remove('selected');
-          const radio = c.querySelector('input[type="radio"]');
-          if (radio) radio.checked = false;
-        });
-      }
-    });
-  }
-
-  // Trigger Realistic Payment Gateway Flow
+  // Trigger Official Razorpay Payment Flow
   document.getElementById('btn-trigger-payment-flow')?.addEventListener('click', executePaymentGatewayFlow);
 
   // Download Receipt Button

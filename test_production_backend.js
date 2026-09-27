@@ -5,6 +5,7 @@
  * database persistence, and cascading account deletion.
  */
 
+require('dotenv').config();
 const http = require('http');
 const crypto = require('crypto');
 const Database = require('better-sqlite3');
@@ -229,7 +230,7 @@ async function runProductionTests() {
   const validSignature = crypto.createHmac('sha256', RAZORPAY_KEY_SECRET).update(signText).digest('hex');
 
   const validVerifyRes = await request({
-    path: '/api/payments/verify',
+    path: '/api/payments/verify-signature',
     method: 'POST',
     headers: { 'Authorization': `Bearer ${userToken}` }
   }, {
@@ -246,7 +247,8 @@ async function runProductionTests() {
     tokensUsed: 60
   });
 
-  assert(validVerifyRes.status === 200 && validVerifyRes.data.success, 'Valid HMAC-SHA256 signature accepted with HTTP 200');
+  assert(validVerifyRes.status === 200 && validVerifyRes.data.success, 'Valid HMAC-SHA256 signature accepted with HTTP 200 on POST /api/payments/verify-signature');
+
   const verifiedBooking = validVerifyRes.data.data.booking;
   assert(verifiedBooking.paymentId === authenticPaymentId, 'Booking record contains verified Razorpay payment ID');
   assert(verifiedBooking.tokensAwarded === 120, 'Awarded +120 Eco-Tokens for certified sustainable stay booking');

@@ -16,6 +16,9 @@
   <!-- Canvas Confetti for Booking Celebrations & Token Rewards -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
+  <!-- Official Razorpay Checkout SDK for Live Production Payments -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
   <!-- Application Stylesheet with Nature Sage & Emerald Forest Palette -->
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -928,178 +931,50 @@
           <span style="font-family: var(--font-mono); font-weight: 800; color: var(--caramel);" id="checkout-reward-preview">+120 Tokens</span>
         </div>
 
-        <!-- Payment Method Tabs -->
-        <div style="margin-bottom: 0.4rem;">
-          <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Select Payment Gateway</label>
-        </div>
-
-        <div class="payment-tabs-bar" role="tablist">
-          <button class="pay-tab-btn active-tab" id="tab-btn-upi" type="button" role="tab" aria-selected="true">
-            <span>📱</span> UPI / QR Code
-          </button>
-          <button class="pay-tab-btn" id="tab-btn-card" type="button" role="tab" aria-selected="false">
-            <span>💳</span> Credit / Debit Card
-          </button>
-          <button class="pay-tab-btn" id="tab-btn-netbanking" type="button" role="tab" aria-selected="false">
-            <span>🏦</span> Net Banking
-          </button>
-        </div>
-
-        <!-- Tab 1: UPI / QR Code (Default) -->
-        <div class="pay-tab-pane active-pane" id="pane-pay-upi" role="tabpanel">
-          <div class="upi-content-grid">
-            <div class="qr-card-container">
-              <div class="qr-white-frame">
-                <img id="checkout-qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=upi%3A%2F%2Fpay%3Fpa%3Dsafarsetu%40icici%26pn%3DSafarSetu%2520India%26am%3D3308%26cu%3DINR" alt="UPI QR Code" style="width: 100%; height: 100%; display: block;">
-              </div>
-              <div class="qr-timer-pill" id="checkout-qr-timer">
-                <span>⏱️</span> <span>05:00 remaining</span>
+        <!-- Official Razorpay Payment Gateway Information Card -->
+        <div class="razorpay-checkout-banner" style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.1rem; margin-top: 1.2rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; margin-bottom: 0.8rem; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <span style="font-size: 1.4rem;">💳</span>
+              <div>
+                <div style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary);">
+                  Official Razorpay Live Checkout
+                </div>
+                <div style="font-size: 0.76rem; color: var(--text-muted);">
+                  RBI & NPCI Compliant • 256-Bit SSL Cryptographic Encryption
+                </div>
               </div>
             </div>
+            <span class="hero-pill-tag" style="background: rgba(16, 185, 129, 0.12); color: var(--emerald); border-color: rgba(16, 185, 129, 0.3);">
+              ⚡ Live Gateway
+            </span>
+          </div>
 
-            <div>
-              <div style="font-size: 0.82rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-secondary);">
-                Scan with any Indian UPI App:
-              </div>
-              <div class="upi-app-badges">
-                <div class="upi-app-chip selected" data-app="gpay">
-                  <span>🔵</span> Google Pay
-                </div>
-                <div class="upi-app-chip" data-app="phonepe">
-                  <span>🟣</span> PhonePe
-                </div>
-                <div class="upi-app-chip" data-app="paytm">
-                  <span>🔷</span> Paytm
-                </div>
-                <div class="upi-app-chip" data-app="bhim">
-                  <span>🇮🇳</span> BHIM
-                </div>
-              </div>
-
-              <div style="font-size: 0.8rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-secondary);">
-                Or Pay via UPI VPA / ID:
-              </div>
-              <div class="upi-id-input-group">
-                <input type="text" class="upi-id-input" id="checkout-upi-id-input" placeholder="aarav@oksbi" value="aarav@oksbi">
-                <button type="button" class="upi-verify-btn" id="btn-verify-upi-id">Verify</button>
-              </div>
-              <div class="checkout-validation-error" id="upi-validation-error">
-                <span>⚠️</span> Please enter a valid UPI VPA (e.g. name@oksbi)
-              </div>
-              <div class="upi-verify-status" id="upi-verify-feedback" style="display: flex;">
-                <span>✓</span> Verified: Aarav Sharma (State Bank of India)
-              </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.6rem; margin-bottom: 0.8rem;">
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 0.6rem 0.75rem;">
+              <div style="font-size: 1.1rem; margin-bottom: 0.2rem;">📱</div>
+              <div style="font-weight: 700; font-size: 0.82rem; color: var(--text-primary);">UPI & QR Code</div>
+              <div style="font-size: 0.7rem; color: var(--text-muted);">GPay, PhonePe, Paytm, BHIM</div>
+            </div>
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 0.6rem 0.75rem;">
+              <div style="font-size: 1.1rem; margin-bottom: 0.2rem;">💳</div>
+              <div style="font-weight: 700; font-size: 0.82rem; color: var(--text-primary);">Cards</div>
+              <div style="font-size: 0.7rem; color: var(--text-muted);">Visa, MasterCard, RuPay</div>
+            </div>
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 0.6rem 0.75rem;">
+              <div style="font-size: 1.1rem; margin-bottom: 0.2rem;">🏦</div>
+              <div style="font-weight: 700; font-size: 0.82rem; color: var(--text-primary);">Net Banking</div>
+              <div style="font-size: 0.7rem; color: var(--text-muted);">50+ Scheduled Banks</div>
+            </div>
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 0.6rem 0.75rem;">
+              <div style="font-size: 1.1rem; margin-bottom: 0.2rem;">👛</div>
+              <div style="font-weight: 700; font-size: 0.82rem; color: var(--text-primary);">Wallets & EMI</div>
+              <div style="font-size: 0.7rem; color: var(--text-muted);">Airtel, MobiKwik, PayLater</div>
             </div>
           </div>
-        </div>
 
-        <!-- Tab 2: Credit / Debit Card -->
-        <div class="pay-tab-pane" id="pane-pay-card" role="tabpanel">
-          <div class="card-form-grid">
-            <div>
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
-                <label style="font-size: 0.76rem; color: var(--text-muted); font-weight: 700;">CARD NUMBER</label>
-                <span id="card-brand-badge" style="font-size: 0.74rem; font-family: var(--font-mono); color: var(--emerald);">💳 Visa / MasterCard / RuPay</span>
-              </div>
-              <input type="text" class="card-input-field mono" id="card-number-input" placeholder="4532 •••• •••• 8921" maxlength="19" value="4532 8820 1934 8921">
-            </div>
-
-            <div>
-              <label style="font-size: 0.76rem; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 0.3rem;">CARDHOLDER NAME</label>
-              <input type="text" class="card-input-field" id="card-name-input" placeholder="Aarav Sharma" value="Aarav Sharma">
-            </div>
-
-            <div class="card-row-split">
-              <div>
-                <label style="font-size: 0.76rem; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 0.3rem;">EXPIRY (MM/YY)</label>
-                <input type="text" class="card-input-field mono" id="card-expiry-input" placeholder="08/29" maxlength="5" value="08/29">
-              </div>
-              <div>
-                <label style="font-size: 0.76rem; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 0.3rem;">CVV / CVC</label>
-                <input type="password" class="card-input-field mono" id="card-cvv-input" placeholder="•••" maxlength="4" value="842">
-              </div>
-            </div>
-
-            <div class="checkout-validation-error" id="card-validation-error">
-              <span>⚠️</span> Please ensure card number (16 digits), valid MM/YY expiry, CVV (3 digits), and name are entered.
-            </div>
-
-            <div style="font-size: 0.74rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.35rem;">
-              <span>🛡️</span> Protected by RBI-compliant end-to-end tokenized card vaults.
-            </div>
-          </div>
-        </div>
-
-        <!-- Tab 3: Net Banking -->
-        <div class="pay-tab-pane" id="pane-pay-netbanking" role="tabpanel">
-          <div class="netbanking-form-box">
-            <div style="font-size: 0.8rem; font-weight: 700; margin-bottom: 0.6rem; color: var(--text-secondary);">
-              Popular Indian Scheduled Banks:
-            </div>
-            <div class="bank-grid">
-              <label class="bank-radio-card selected" for="bank-sbi">
-                <input type="radio" name="netbanking-bank" id="bank-sbi" value="State Bank of India" checked>
-                <div>
-                  <div class="bank-card-title">State Bank of India</div>
-                  <div style="font-size: 0.72rem; color: var(--text-muted);">Retail & Corporate</div>
-                </div>
-              </label>
-
-              <label class="bank-radio-card" for="bank-hdfc">
-                <input type="radio" name="netbanking-bank" id="bank-hdfc" value="HDFC Bank">
-                <div>
-                  <div class="bank-card-title">HDFC Bank</div>
-                  <div style="font-size: 0.72rem; color: var(--text-muted);">Fast NetBanking</div>
-                </div>
-              </label>
-
-              <label class="bank-radio-card" for="bank-icici">
-                <input type="radio" name="netbanking-bank" id="bank-icici" value="ICICI Bank">
-                <div>
-                  <div class="bank-card-title">ICICI Bank</div>
-                  <div style="font-size: 0.72rem; color: var(--text-muted);">iMobile / Retail</div>
-                </div>
-              </label>
-
-              <label class="bank-radio-card" for="bank-axis">
-                <input type="radio" name="netbanking-bank" id="bank-axis" value="Axis Bank">
-                <div>
-                  <div class="bank-card-title">Axis Bank</div>
-                  <div style="font-size: 0.72rem; color: var(--text-muted);">Instant Gateway</div>
-                </div>
-              </label>
-
-              <label class="bank-radio-card" for="bank-pnb">
-                <input type="radio" name="netbanking-bank" id="bank-pnb" value="Punjab National Bank">
-                <div>
-                  <div class="bank-card-title">Punjab National Bank</div>
-                  <div style="font-size: 0.72rem; color: var(--text-muted);">PNB ONE / Retail</div>
-                </div>
-              </label>
-            </div>
-
-            <div style="font-size: 0.8rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-secondary);">
-              Or Select Another Bank:
-            </div>
-            <select class="bank-select-dropdown" id="bank-select-dropdown">
-              <option value="">-- Choose from 40+ Other Banks --</option>
-              <option value="State Bank of India">State Bank of India (SBI)</option>
-              <option value="HDFC Bank">HDFC Bank</option>
-              <option value="ICICI Bank">ICICI Bank</option>
-              <option value="Axis Bank">Axis Bank</option>
-              <option value="Punjab National Bank">Punjab National Bank (PNB)</option>
-              <option value="Kotak Mahindra Bank">Kotak Mahindra Bank</option>
-              <option value="Bank of Baroda">Bank of Baroda</option>
-              <option value="IndusInd Bank">IndusInd Bank</option>
-              <option value="Canara Bank">Canara Bank</option>
-              <option value="Union Bank of India">Union Bank of India</option>
-              <option value="IDFC FIRST Bank">IDFC FIRST Bank</option>
-              <option value="Yes Bank">Yes Bank</option>
-            </select>
-
-            <div class="checkout-validation-error" id="netbanking-validation-error">
-              <span>⚠️</span> Please select your bank to proceed with Net Banking
-            </div>
+          <div style="font-size: 0.76rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; padding-top: 0.6rem; border-top: 1px solid var(--border-subtle);">
+            <span>🛡️</span> Clicking "Pay with Razorpay" will launch the official Razorpay Checkout modal for authentic payment processing.
           </div>
         </div>
 
@@ -1109,123 +984,7 @@
             Cancel
           </button>
           <button class="btn-emerald-action" id="btn-trigger-payment-flow" style="flex: 1; justify-content: center; padding: 0.95rem; font-size: 1rem;" type="button">
-            <span>🔒</span> <span id="btn-pay-text-label">Pay ₹3,308 via UPI</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- STEP 2: REALISTIC SECURE PROCESSING LOADER WITH ROTATING LOCK SPINNER -->
-      <div class="checkout-processing-view" id="checkout-processing-view">
-        <div class="processing-lock-wrap">
-          <div class="processing-lock-ring"></div>
-          <div class="processing-lock-icon">🔒</div>
-        </div>
-        <h3 id="checkout-processing-title" style="font-size: 1.45rem; font-weight: 800; margin-bottom: 0.4rem;">
-          Contacting issuing bank via 256-bit SSL encryption...
-        </h3>
-        <p style="font-size: 0.9rem; color: var(--text-secondary); max-width: 440px; margin: 0 auto;" id="checkout-processing-subtext">
-          Establishing 256-bit encrypted handshake with your payment provider...
-        </p>
-
-        <div class="processing-step-meter">
-          <div class="processing-step-bar" id="checkout-processing-bar"></div>
-        </div>
-
-        <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 1rem;">
-          🛡️ RBI / NPCI Verified Gateway • Please do not close or refresh this page.
-        </div>
-      </div>
-
-      <!-- STEP 2A: UPI APPROVAL INTERACTIVE PIPELINE -->
-      <div class="checkout-upi-approval-view" id="checkout-upi-approval-view">
-        <div class="processing-lock-wrap" style="width: 72px; height: 72px; margin-bottom: 0.8rem;">
-          <div class="processing-lock-ring"></div>
-          <div class="processing-lock-icon" style="font-size: 1.8rem;">📱</div>
-        </div>
-
-        <div class="auth-badge-pill">
-          <span>⚡</span> UPI Collect Request Dispatched
-        </div>
-
-        <h3 style="font-size: 1.45rem; font-weight: 800; margin-bottom: 0.35rem;">
-          Awaiting UPI App Authorization
-        </h3>
-        <p style="font-size: 0.86rem; color: var(--text-secondary); max-width: 460px; margin: 0 auto 1rem auto;">
-          Open your UPI app on your mobile device to authorize request sent to <strong id="upi-approval-vpa-display" style="color: var(--sage); font-family: var(--font-mono);">aarav@oksbi</strong>
-        </p>
-
-        <div class="auth-notice-card">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.6rem;">
-            <span style="font-size: 0.82rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Payable Amount</span>
-            <span style="font-size: 1.25rem; font-weight: 800; color: var(--emerald); font-family: var(--font-heading);" id="upi-approval-amount">₹3,308</span>
-          </div>
-          <div style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.6;">
-            <div>1. Open <strong>Google Pay / PhonePe / Paytm / BHIM</strong> on your mobile</div>
-            <div>2. Check for the collect request from <strong>SafarSetu Tourism (NPCI)</strong></div>
-            <div>3. Enter your secret UPI PIN to approve the transaction</div>
-          </div>
-        </div>
-
-        <div class="qr-timer-pill" id="upi-approval-timer" style="margin: 0.8rem auto 1.2rem auto; display: inline-flex;">
-          <span>⏱️</span> <span id="upi-approval-timer-text">Open your UPI app to approve request: 02:45 remaining</span>
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 0.6rem;">
-          <button type="button" class="btn-emerald-action" id="btn-simulate-upi-approve" style="justify-content: center; padding: 0.9rem; font-size: 1rem; width: 100%;">
-            <span>⚡</span> Simulate UPI App Approval (Bank Push)
-          </button>
-          <button type="button" class="filter-chip-btn" id="btn-cancel-upi-approval" style="justify-content: center; padding: 0.75rem; width: 100%;">
-            Cancel & Return to Payment Options
-          </button>
-        </div>
-      </div>
-
-      <!-- STEP 2B: 2-FACTOR AUTHENTICATION (OTP) PROMPT -->
-      <div class="checkout-otp-view" id="checkout-otp-view">
-        <div class="processing-lock-wrap" style="width: 72px; height: 72px; margin-bottom: 0.8rem;">
-          <div class="processing-lock-ring"></div>
-          <div class="processing-lock-icon" style="font-size: 1.8rem;">🏦</div>
-        </div>
-
-        <div class="auth-badge-pill">
-          <span>🛡️</span> 3D Secure 2.0 Bank Verification
-        </div>
-
-        <h3 style="font-size: 1.45rem; font-weight: 800; margin-bottom: 0.35rem;">
-          Issuing Bank 2-Factor Authentication
-        </h3>
-        <p style="font-size: 0.86rem; color: var(--text-secondary); max-width: 460px; margin: 0 auto 1rem auto;">
-          An OTP has been sent to your registered mobile number: Enter 6-digit OTP
-        </p>
-
-        <div class="auth-notice-card">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.6rem;">
-            <span style="font-size: 0.82rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Payable to SafarSetu</span>
-            <span style="font-size: 1.25rem; font-weight: 800; color: var(--emerald); font-family: var(--font-heading);" id="otp-approval-amount">₹3,308</span>
-          </div>
-          <div style="margin: 0.8rem 0 0.4rem 0;">
-            <label style="font-size: 0.76rem; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 0.4rem; text-transform: uppercase;">
-              Enter 6-Digit One-Time Password (OTP)
-            </label>
-            <input type="text" class="card-input-field mono" id="checkout-otp-input" placeholder="Enter 6-digit OTP" maxlength="6" style="font-size: 1.3rem; letter-spacing: 0.35em; text-align: center; font-weight: 700;">
-            <div class="checkout-validation-error" id="otp-validation-error">
-              <span>⚠️</span> Please enter a valid 6-digit OTP code
-            </div>
-          </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; font-size: 0.78rem;">
-            <span style="color: var(--text-muted);">Sent to +91 98••• ••210</span>
-            <button type="button" id="btn-autofill-otp" style="background: none; border: none; color: var(--sage); cursor: pointer; text-decoration: underline; font-weight: 600;">
-              ⚡ Auto-Fill Demo OTP (123456)
-            </button>
-          </div>
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 0.6rem;">
-          <button type="button" class="btn-emerald-action" id="btn-submit-otp" style="justify-content: center; padding: 0.9rem; font-size: 1rem; width: 100%;">
-            <span>🔒</span> Verify OTP & Authorize Payment
-          </button>
-          <button type="button" class="filter-chip-btn" id="btn-cancel-otp" style="justify-content: center; padding: 0.75rem; width: 100%;">
-            Cancel & Back to Payment Methods
+            <span>🔒</span> <span id="btn-pay-text-label">Pay ₹3,308 with Razorpay</span>
           </button>
         </div>
       </div>
@@ -1243,8 +1002,12 @@
         <!-- Digital Receipt Box -->
         <div class="receipt-card-box">
           <div class="receipt-data-row">
-            <span style="color: var(--text-muted);">Transaction ID</span>
-            <span style="font-family: var(--font-mono); font-weight: 700; color: var(--sage);" id="receipt-txn-id">TXN-SETU-849204</span>
+            <span style="color: var(--text-muted);">Razorpay Payment ID</span>
+            <span style="font-family: var(--font-mono); font-weight: 700; color: var(--sage);" id="receipt-txn-id">pay_rzp_live_xxx</span>
+          </div>
+          <div class="receipt-data-row">
+            <span style="color: var(--text-muted);">Razorpay Order ID</span>
+            <span style="font-family: var(--font-mono); font-weight: 700; color: var(--emerald);" id="receipt-order-id">order_xxx</span>
           </div>
           <div class="receipt-data-row">
             <span style="color: var(--text-muted);">Date & Time</span>
@@ -1256,7 +1019,7 @@
           </div>
           <div class="receipt-data-row">
             <span style="color: var(--text-muted);">Payment Method</span>
-            <span id="receipt-pay-method">UPI (aarav@oksbi)</span>
+            <span id="receipt-pay-method">Official Razorpay Gateway</span>
           </div>
           <div class="receipt-data-row">
             <span style="color: var(--text-muted);">Eco-Tokens Balance</span>

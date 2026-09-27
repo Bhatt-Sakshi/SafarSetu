@@ -29,29 +29,23 @@ const {
 const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'safarsetu_production_grade_jwt_secret_2026_super_secure_key';
-const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || 'rzp_test_SafarSetu2026Key';
-const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || 'safarsetu_razorpay_secret_key_2026';
+const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID;
+const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
 
-// Helper to detect if a live/test Razorpay API key is supplied
-function isLiveRazorpayKey(keyId) {
-  if (!keyId || typeof keyId !== 'string') return false;
-  const trimmed = keyId.trim();
-  if (trimmed.startsWith('rzp_test_placeholder') || trimmed.startsWith('rzp_live_placeholder')) return false;
-  if (trimmed === 'rzp_test_SafarSetu2026Key' || trimmed.includes('YourKeyHere') || trimmed.includes('placeholder') || trimmed.includes('dummy')) return false;
-  return /^rzp_(test|live)_[A-Za-z0-9]{10,}$/.test(trimmed);
-}
-
-// Initialize Razorpay SDK instance
+// Initialize official Razorpay SDK instance
 let razorpay = null;
 try {
-  if (RAZORPAY_KEY_ID && RAZORPAY_KEY_SECRET && isLiveRazorpayKey(RAZORPAY_KEY_ID)) {
+  if (RAZORPAY_KEY_ID && RAZORPAY_KEY_SECRET) {
     razorpay = new Razorpay({
       key_id: RAZORPAY_KEY_ID,
       key_secret: RAZORPAY_KEY_SECRET
     });
+    console.log('✓ Official Razorpay SDK initialized with Key ID:', RAZORPAY_KEY_ID);
+  } else {
+    console.warn('⚠️ Razorpay credentials missing in environment (.env).');
   }
 } catch (e) {
-  console.warn('Razorpay initialization notice:', e.message);
+  console.error('Razorpay initialization error:', e.message);
 }
 
 // Middleware
@@ -438,10 +432,11 @@ app.get('/api/profile', optionalAuth, (req, res) => {
 });
 
 // ========================================================
-// 💳 3. PRODUCTION-GRADE PAYMENT INTEGRATION (RAZORPAY STANDARD)
+// ========================================================
+// 💳 3. PRODUCTION-GRADE PAYMENT INTEGRATION (OFFICIAL RAZORPAY SDK)
 // ========================================================
 
-// Create Razorpay Order (Protected / True Server Calculation)
+// Create Razorpay Order: Calls razorpay.orders.create({ amount, currency: 'INR', receipt })
 app.post('/api/payments/create-order', optionalAuth, async (req, res) => {
   try {
     const {
@@ -475,46 +470,41 @@ app.post('/api/payments/create-order', optionalAuth, async (req, res) => {
     const finalAmount = subtotal + taxes;
     const amountInPaise = Math.round(finalAmount * 100);
 
-    // Check if RAZORPAY_KEY_ID is missing, placeholder, or invalid
-    const isConfiguredKey = isLiveRazorpayKey(RAZORPAY_KEY_ID);
-    let isSandbox = !isConfiguredKey || !razorpay;
-    // Default simulated / mock order ID (e.g. order_demo_108239)
-    let orderId = `order_demo_${Math.floor(100000 + Math.random() * 900000)}`;
+    const receipt = `rcpt_${Date.now().toString(36)}_${Math.random().toString(36).substring(2, 6)}`;
 
-    // Invoke Razorpay API if live/test credentials are configured
-    if (isConfiguredKey && razorpay) {
-      try {
-        const rzpOrder = await razorpay.orders.create({
-          amount: amountInPaise,
-          currency: 'INR',
-          receipt: `rcpt_${Date.now().toString(36)}`,
-          notes: {
-            userId: user ? user.id : 'guest',
-            itemType,
-            title: title.substring(0, 30)
-          }
-        });
-        if (rzpOrder && rzpOrder.id) {
-          orderId = rzpOrder.id;
-          isSandbox = false;
-        }
-      } catch (rzpErr) {
-        console.warn('Razorpay authentication or live order creation failed, falling back to Sandbox Simulator mode:', rzpErr.message);
-        isSandbox = true;
-        orderId = `order_demo_${Math.floor(100000 + Math.random() * 900000)}`;
-      }
+    if (!razorpay) {
+      return res.status(500).json({
+        success: false,
+        message: 'Razorpay SDK is not initialized. Please verify RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in .env'
+      });
     }
+
+    // Call official Razorpay Orders API
+    const rzpOrder = await razorpay.orders.create({
+      amount: amountInPaise,
+      currency: 'INR',
+      receipt: receipt,
+      notes: {
+        userId: user ? user.id : 'guest',
+        itemType,
+        title: String(title).substring(0, 30)
+      }
+    });
+
+    console.log(`✓ Created official Razorpay order ${rzpOrder.id} for ₹${finalAmount} (${amountInPaise} paise)`);
 
     res.json({
       success: true,
+      orderId: rzpOrder.id,
+      amount: rzpOrder.amount,
+      currency: rzpOrder.currency,
+      keyId: RAZORPAY_KEY_ID,
       data: {
-        orderId,
-        amount: amountInPaise,
+        orderId: rzpOrder.id,
+        amount: rzpOrder.amount,
         amountRupees: finalAmount,
-        currency: 'INR',
+        currency: rzpOrder.currency,
         keyId: RAZORPAY_KEY_ID,
-        isSandbox,
-        sandboxMode: isSandbox,
         breakdown: {
           basePrice: bPrice,
           discountSaved: dSaved,
@@ -528,12 +518,13 @@ app.post('/api/payments/create-order', optionalAuth, async (req, res) => {
     });
   } catch (err) {
     console.error('Payment order creation error:', err);
-    res.status(500).json({ success: false, message: 'Server failed to calculate price and initialize order.' });
+    res.status(500).json({ success: false, message: err.message || 'Server failed to calculate price and initialize order.' });
   }
 });
 
-// Verify Razorpay HMAC-SHA256 Signature & Confirm Booking
-app.post('/api/payments/verify', optionalAuth, (req, res) => {
+// Authentic Cryptographic HMAC SHA256 Signature Verification Handler
+// Only inserts booking records into SQLite if the signature is authentic!
+function verifyRazorpaySignatureHandler(req, res) {
   try {
     const {
       razorpay_order_id,
@@ -550,41 +541,26 @@ app.post('/api/payments/verify', optionalAuth, (req, res) => {
       meta = {}
     } = req.body;
 
-    if (!razorpay_order_id || !razorpay_payment_id) {
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
       return res.status(400).json({
         success: false,
-        message: 'razorpay_order_id and razorpay_payment_id are mandatory for verification.'
+        message: 'razorpay_order_id, razorpay_payment_id, and razorpay_signature are mandatory for verification.'
       });
     }
 
-    // Verify HMAC-SHA256 signature
+    // Perform authentic cryptographic HMAC SHA256 verification using crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+    const secret = process.env.RAZORPAY_KEY_SECRET || RAZORPAY_KEY_SECRET;
     const text = razorpay_order_id + '|' + razorpay_payment_id;
-    const expectedSignature = crypto.createHmac('sha256', RAZORPAY_KEY_SECRET).update(text).digest('hex');
-    const fallbackSecretSignature = crypto.createHmac('sha256', 'safarsetu_razorpay_secret_key_2026').update(text).digest('hex');
+    const expectedSignature = crypto.createHmac('sha256', secret).update(text).digest('hex');
 
-    const isHmacValid = (razorpay_signature === expectedSignature) || (razorpay_signature === fallbackSecretSignature);
-    
-    // Sandbox / Demo Verification:
-    // Accept mock transaction IDs (e.g. pay_demo_success, pay_demo_..., pay_sim_...)
-    const isMockTxn = razorpay_payment_id.startsWith('pay_demo') || 
-                      razorpay_order_id.startsWith('order_demo') || 
-                      razorpay_payment_id.startsWith('pay_sim');
-
-    const isDemoValid = isMockTxn && (
-      razorpay_signature === 'sig_demo_success' ||
-      razorpay_signature === 'pay_demo_success' ||
-      isHmacValid
-    ) && razorpay_signature !== 'fake_tampered_signature_hex_code';
-
-    const isValid = isHmacValid || isDemoValid;
-
-    if (!isValid) {
+    if (razorpay_signature !== expectedSignature) {
       return res.status(400).json({
         success: false,
         message: 'Invalid or tampered payment signature. Payment authorization rejected.'
       });
     }
 
+    // Authentic signature verified! Proceed with SQLite database persistence
     const user = req.user || db.prepare('SELECT * FROM users WHERE id = ?').get('demo_user_aarav');
     const bPrice = Math.max(0, parseFloat(basePrice) || 0);
     const dSaved = Math.max(0, parseFloat(discountSaved) || 0);
@@ -606,7 +582,7 @@ app.post('/api/payments/verify', optionalAuth, (req, res) => {
 
     const bookingId = `BK-${Date.now().toString(36).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
-    // Write confirmed booking to SQLite
+    // Write confirmed booking to SQLite bookings table
     db.prepare(`
       INSERT INTO bookings (
         id, user_id, category, item_name, amount_paid,
@@ -648,9 +624,26 @@ app.post('/api/payments/verify', optionalAuth, (req, res) => {
 
     const confirmedBooking = db.prepare('SELECT * FROM bookings WHERE id = ?').get(bookingId);
 
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    }) + ', ' + now.toLocaleTimeString('en-IN', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    }) + ' IST';
+
     res.json({
       success: true,
-      message: 'Razorpay payment verified and reservation securely recorded in database!',
+      message: 'Razorpay payment signature verified and reservation recorded in SQLite database!',
+      transactionId: razorpay_payment_id,
+      orderId: razorpay_order_id,
+      amount: totalPaid,
+      item: title,
+      tokensEarned: tokensAwarded,
+      date: dateStr,
       data: {
         booking: formatBookingRecord(confirmedBooking),
         orderId: razorpay_order_id,
@@ -666,174 +659,13 @@ app.post('/api/payments/verify', optionalAuth, (req, res) => {
     console.error('Verify payment error:', err);
     res.status(500).json({ success: false, message: 'Server error during payment verification.' });
   }
-});
+}
 
-// ========================================================
-// 💳 3B. AUTHENTIC SAFARSETU PAYMENT GATEWAY & VERIFICATION
-// ========================================================
-// Clean backend route: POST /api/payments/process-checkout
-// Validates authenticated JWT token from session/header, generates
-// cryptographic TXN_SETU_ transaction ID, saves reservation to SQLite,
-// credits Eco-Tokens, and returns comprehensive confirmation.
-app.post('/api/payments/process-checkout', (req, res) => {
-  try {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-    let user = null;
+// Endpoint POST /api/payments/verify-signature & alias /api/payments/verify
+app.post('/api/payments/verify-signature', optionalAuth, verifyRazorpaySignatureHandler);
+app.post('/api/payments/verify', optionalAuth, verifyRazorpaySignatureHandler);
 
-    if (token) {
-      try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        user = db.prepare('SELECT * FROM users WHERE id = ?').get(decoded.userId);
-        if (!user) {
-          return res.status(404).json({ success: false, message: 'User record not found.' });
-        }
-      } catch (jwtErr) {
-        return res.status(403).json({ success: false, message: 'Invalid or expired authorization token.' });
-      }
-    } else {
-      // Out-of-the-box fallback to demo user for seamless local evaluation
-      user = db.prepare('SELECT * FROM users WHERE id = ?').get('demo_user_aarav') || db.prepare('SELECT * FROM users LIMIT 1').get();
-      if (!user) {
-        return res.status(401).json({ success: false, message: 'Authentication required. Authorization token missing.' });
-      }
-    }
 
-    const {
-      itemType = 'stay',
-      title = 'SafarSetu Booking',
-      destination = 'Manali',
-      dateRange = 'Flexible',
-      guests = 1,
-      basePrice,
-      discountSaved = 0,
-      tokensUsed = 0,
-      paymentMethod = 'UPI',
-      paymentDetails = {},
-      meta = {}
-    } = req.body;
-
-    if (basePrice === undefined || basePrice === null) {
-      return res.status(400).json({ success: false, message: 'basePrice is required.' });
-    }
-
-    const bPrice = Math.max(0, parseFloat(basePrice) || 0);
-    const dSaved = Math.max(0, parseFloat(discountSaved) || 0);
-
-    // Validate tokens allowed (capped at user available tokens and 40% base price)
-    const userTokens = user ? user.eco_tokens : 500;
-    const maxAllowedTokens = Math.min(userTokens, Math.floor(bPrice * 0.4 / 2));
-    const tUsed = Math.min(Math.max(0, parseInt(tokensUsed) || 0), maxAllowedTokens);
-    const tokenDiscountRupees = tUsed * 2;
-
-    const taxRate = itemType === 'pro' ? 0.18 : 0.05;
-    const subtotal = Math.max(0, bPrice - dSaved - tokenDiscountRupees);
-    const taxes = Math.round(subtotal * taxRate);
-    const finalAmount = subtotal + taxes;
-
-    // Generate authentic cryptographic transaction reference ID: TXN_SETU_ + Date.now() + random hex string
-    const randomHex = crypto.randomBytes(4).toString('hex').toLowerCase();
-    const transactionId = `TXN_SETU_${Date.now()}_${randomHex}`;
-
-    // Calculate Eco-Tokens awarded
-    const isPro = Boolean(user && user.is_pro) || itemType === 'pro';
-    const multiplier = isPro ? 2 : 1;
-    let baseReward = 50;
-    if (itemType === 'transit') baseReward = 85;
-    if (itemType === 'stay') baseReward = 120;
-    if (itemType === 'market') baseReward = 60;
-    if (itemType === 'pro') baseReward = 100;
-    const tokensEarned = baseReward * multiplier;
-
-    const bookingId = `BK-${Date.now().toString(36).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
-
-    // Save reservation details into the SQLite database under authenticated user's ID
-    db.prepare(`
-      INSERT INTO bookings (
-        id, user_id, category, item_name, amount_paid,
-        eco_tokens_awarded, tokens_used, status, payment_id,
-        destination, date_range, guests, meta_json
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      bookingId,
-      user.id,
-      itemType,
-      title,
-      finalAmount,
-      tokensEarned,
-      tUsed,
-      'confirmed',
-      transactionId,
-      destination,
-      dateRange,
-      parseInt(guests) || 1,
-      JSON.stringify({
-        ...(meta || {}),
-        paymentMethod,
-        paymentDetails,
-        taxRate,
-        taxes,
-        basePrice: bPrice,
-        discountSaved: dSaved,
-        tokenDiscountRupees
-      })
-    );
-
-    // Credit appropriate Eco-Tokens to the user's profile record in SQLite
-    const newTokens = Math.max(0, user.eco_tokens - tUsed + tokensEarned);
-    const newCarbon = parseFloat((user.carbon_saved_kg + (itemType === 'pro' ? 25.0 : 14.5)).toFixed(1));
-    const newPro = itemType === 'pro' ? 1 : user.is_pro;
-
-    db.prepare(`
-      UPDATE users
-      SET eco_tokens = ?, carbon_saved_kg = ?, is_pro = ?
-      WHERE id = ?
-    `).run(newTokens, newCarbon, newPro, user.id);
-
-    user.eco_tokens = newTokens;
-    user.carbon_saved_kg = newCarbon;
-    user.is_pro = newPro;
-
-    const now = new Date();
-    const dateStr = now.toLocaleDateString('en-IN', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric'
-    }) + ', ' + now.toLocaleTimeString('en-IN', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    }) + ' IST';
-
-    const confirmedBooking = db.prepare('SELECT * FROM bookings WHERE id = ?').get(bookingId);
-
-    return res.json({
-      success: true,
-      transactionId,
-      amount: finalAmount,
-      item: title,
-      tokensEarned,
-      date: dateStr,
-      message: 'Payment verified and reservation securely recorded in database!',
-      data: {
-        booking: formatBookingRecord(confirmedBooking),
-        transactionId,
-        amount: finalAmount,
-        item: title,
-        tokensEarned,
-        date: dateStr,
-        updatedWallet: {
-          ecoTokens: user.eco_tokens,
-          carbonSavedKg: user.carbon_saved_kg,
-          isPro: Boolean(user.is_pro)
-        }
-      }
-    });
-  } catch (err) {
-    console.error('Process checkout error:', err);
-    return res.status(500).json({ success: false, message: 'Server error during payment checkout processing.' });
-  }
-});
 
 // Standard Bookings Endpoint (Backward compatibility & direct testing)
 app.post('/api/bookings', optionalAuth, (req, res) => {

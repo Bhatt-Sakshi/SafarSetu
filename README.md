@@ -6,7 +6,7 @@ SafarSetu is a full-stack smart tourism and eco-mobility application designed to
 ---
 
 ## 🚀 Live Demo
-* **Live Deployment:** [https://safarsetu-tixw.onrender.com](https://safarsetu-tixw.onrender.com)
+* **Live Deployment:** [https://safarsetu-tixw.onrender.com](https://safarsetu-tlxw.onrender.com)
 * **GitHub Repository:** [https://github.com/BhattSakshi/SafarSetu](https://github.com/BhattSakshi/SafarSetu)
 
 ---

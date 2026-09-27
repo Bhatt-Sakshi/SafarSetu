@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafarSetu — Discover the Soul of India | Modern Indian Travel & Booking</title>
+  <meta name="description" content="SafarSetu — Discover the Soul of India. Modern Indian travel and tourism booking web portal featuring dynamic any-destination trip itineraries, multi-modal transit (Vande Bharat, EV buses), certified heritage stays, authentic GI-tagged crafts, and real-time mountain hazard alerts.">
+  
+  <!-- Favicon & Open Graph -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+  
+  <!-- Leaflet.js Interactive Mapping CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  
+  <!-- Canvas Confetti for Booking Celebrations & Token Rewards -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <!-- Official Razorpay Standard Checkout SDK -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+  <!-- Application Stylesheet with Nature Sage & Emerald Forest Palette -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- PERSISTENT NAVIGATION HEADER -->
+  <header class="navbar-persistent" id="main-header">
+    <div class="nav-container">
+      <!-- Brand Logo -->
+      <a href="#home" class="nav-brand" id="brand-link">
+        <div class="brand-logo-icon">🌿</div>
+        <div class="brand-text-group">
+          <div class="brand-title">Safar<span class="accent-verse">Setu</span></div>
+          <span style="font-size: 0.65rem; color: var(--text-secondary); font-weight: 600; letter-spacing: 0.02em;">Discover the Soul of India</span>
+        </div>
+      </a>
+
+      <!-- Route Navigation Links (Visible when authenticated) -->
+      <nav aria-label="Main Navigation" id="main-nav-bar">
+        <ul class="nav-links" id="nav-links-list">
+          <li><a href="#home" class="nav-item-btn active" id="nav-home">🏠 Home</a></li>
+          <li><a href="#planner" class="nav-item-btn" id="nav-planner">🗺️ Trip Planner</a></li>
+          <li><a href="#transit" class="nav-item-btn" id="nav-transit">✈️ Transit</a></li>
+          <li><a href="#hotels" class="nav-item-btn" id="nav-hotels">🏨 Stays</a></li>
+          <li><a href="#food-market" class="nav-item-btn" id="nav-market">🍲 Food & Market</a></li>
+          <li><a href="#pricing" class="nav-item-btn" id="nav-pricing">💎 SafarSetu PRO</a></li>
+          <li><a href="#profile" class="nav-item-btn" id="nav-profile">👤 Profile</a></li>
+        </ul>
+      </nav>
+
+      <!-- Right Action Items -->
+      <div class="nav-actions">
+        <!-- Live Eco-Tokens Balance Pill -->
+        <div class="wallet-badge-pill" id="navbar-wallet-btn" title="View Eco-Tokens Vault" onclick="location.hash='#profile'">
+          <span>🪙</span>
+          <span id="nav-token-balance">500</span>
+          <small style="font-size: 0.7rem; opacity: 0.85;">Tokens</small>
+        </div>
+
+        <!-- SafarSetu PRO Badge / Upgrade -->
+        <button class="pro-upgrade-btn" id="navbar-pro-btn" onclick="location.hash='#pricing'">
+          <span id="nav-pro-icon">⚡</span>
+          <span id="nav-pro-text">SafarSetu PRO</span>
+        </button>
+
+        <!-- Persona Role Switcher -->
+        <div class="role-selector-pill" id="navbar-role-pill" title="Switch Exploring Persona">
+          <select id="user-role-select" aria-label="Select Persona Role">
+            <option value="tourist">🎒 Tourist</option>
+            <option value="hotelier">🏨 Hotelier</option>
+            <option value="artisan">🎨 Local Artisan</option>
+          </select>
+        </div>
+
+        <!-- Dark / Light Theme Toggle -->
+        <button class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle Dark and Light Mode" title="Toggle Dark/Light Mode">
+          <span id="theme-toggle-icon">🌙</span>
+        </button>
+
+        <!-- User Profile Avatar & Name Tag -->
+        <button class="nav-avatar-btn" id="navbar-avatar-btn" onclick="location.hash='#profile'" title="User Profile">
+          <img id="nav-user-avatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80" alt="User Avatar">
+        </button>
+
+        <!-- Sign Out Button -->
+        <button class="nav-logout-btn" id="navbar-logout-btn" title="Sign Out of Session">
+          <span>🚪</span> Sign Out
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- REFINED HIGH-RISK MOUNTAIN LANDSLIDE HAZARD ALERT BANNER (DISMISSIBLE) -->
+  <aside class="landslide-hazard-banner" id="landslide-hazard-banner" style="display: none;" role="alert">
+    <div class="hazard-content-wrap">
+      <div class="hazard-text-left">
+        <div class="hazard-siren-icon">🚨</div>
+        <div>
+          <h2 class="hazard-headline" id="hazard-banner-title">
+            HIGH LANDSLIDE RISK ALERT: Heavy rainfall detected along mountain passes. High risk of rockfalls and road closures.
+          </h2>
+          <p class="hazard-subline" id="hazard-banner-subtitle">
+            🚧 Disaster Authority Advisory: Travel restricted during night hours.
+          </p>
+          <div style="margin-top: 0.35rem; display: flex; align-items: center; gap: 0.6rem;">
+            <span class="terrain-safety-badge badge-extreme-hazard" id="hazard-terrain-badge">🔴 Extreme Landslide Hazard</span>
+            <span style="font-size: 0.8rem; color: #FEE2E2;" id="hazard-impacted-routes">Impacted: Rohtang Pass NH-3, Solang Ridge</span>
+          </div>
+        </div>
+      </div>
+      <div class="hazard-actions-right">
+        <button class="btn-reroute-safety" id="btn-accept-safe-reroute">
+          <span>🛡️</span>
+          <span>Safe Reroute Recommendation</span>
+          <span style="background: rgba(185, 28, 28, 0.15); color: #7F1D1D; padding: 2px 7px; border-radius: 999px; font-size: 0.75rem; font-weight: 800;">+100 Tokens</span>
+        </button>
+        <button class="btn-sos-emergency" id="btn-open-sos-modal">
+          <span>🆘</span> Emergency SOS
+        </button>
+        <button class="hazard-dismiss-btn" id="btn-dismiss-hazard" aria-label="Dismiss alert" title="Dismiss Alert">✕</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN APP CONTAINER FOR MULTI-PAGE VIEWS -->
+  <main class="app-view-container" id="main-content">
+
+    <!-- ========================================================
+         VIEW 0: AUTH GATEKEEPER SCREEN (MANDATORY SIGN-UP FIRST)
+    ======================================================== -->
+    <section class="page-view" id="view-auth">
+      <div class="auth-gatekeeper-stage">
+        <div class="auth-ambient-glow"></div>
+        <div class="auth-card-box">
+          <div class="auth-logo-symbol">🌿</div>
+          <div class="auth-brand-badge">
+            <span>🌿</span> Discover the Soul of India
+          </div>
+          <h1 class="auth-title">Welcome to <span style="color: var(--emerald);">SafarSetu</span></h1>
+          <p class="auth-subtitle">
+            Modern Indian Travel & Tourism Portal • Authentic Itineraries, Multi-Modal Transit & Mountain Safety Intelligence.
+          </p>
+
+          <!-- Toggle Tabs: Sign Up vs Sign In -->
+          <div class="auth-tabs-nav">
+            <button class="auth-tab-btn active" id="tab-signup-btn" type="button">
+              ✨ Sign Up (+500 Tokens)
+            </button>
+            <button class="auth-tab-btn" id="tab-signin-btn" type="button">
+              🔑 Sign In
+            </button>
+          </div>
+
+          <!-- Role Selection ("Who is Exploring?") -->
+          <div id="auth-role-section">
+            <div class="auth-roles-label">Who is Exploring? Select Your Persona:</div>
+            <div class="auth-roles-grid">
+              <div class="auth-role-card selected" data-role="tourist" id="role-card-tourist">
+                <span class="auth-role-icon">🎒</span>
+                <span class="auth-role-title">Tourist / Explorer</span>
+                <span style="font-size: 0.68rem; color: var(--text-muted);">Itineraries & Tokens</span>
+              </div>
+              <div class="auth-role-card" data-role="hotelier" id="role-card-hotelier">
+                <span class="auth-role-icon">🏨</span>
+                <span class="auth-role-title">Homestay / Hotelier</span>
+                <span style="font-size: 0.68rem; color: var(--text-muted);">Dynamic Yield</span>
+              </div>
+              <div class="auth-role-card" data-role="artisan" id="role-card-artisan">
+                <span class="auth-role-icon">🎨</span>
+                <span class="auth-role-title">Local Artisan / Guide</span>
+                <span style="font-size: 0.68rem; color: var(--text-muted);">GI Tag Hub</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Auth Form -->
+          <form id="auth-gatekeeper-form">
+            <div class="auth-input-group">
+              <div id="auth-name-container">
+                <label class="auth-field-label" for="auth-input-name">Full Name</label>
+                <input class="auth-input-box" type="text" id="auth-input-name" placeholder="e.g. Aarav Sharma" required>
+              </div>
+              <div>
+                <label class="auth-field-label" for="auth-input-email">Email Address</label>
+                <input class="auth-input-box" type="email" id="auth-input-email" placeholder="name@example.com" required>
+              </div>
+              <div>
+                <label class="auth-field-label" for="auth-input-password">Secure Password</label>
+                <input class="auth-input-box" type="password" id="auth-input-password" placeholder="••••••••" required>
+              </div>
+            </div>
+
+            <!-- 500 Eco-Tokens Sign-Up Bonus Callout -->
+            <div class="auth-bonus-box" id="auth-bonus-callout">
+              <span style="font-size: 1.4rem;">🪙</span>
+              <div>
+                <strong>500 Eco-Tokens Sign-Up Bonus Included!</strong>
+                <div style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.15rem;">
+                  Instantly credited to your wallet vault for stay discounts and artisan masterclasses.
+                </div>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button class="btn-primary-action" type="submit" id="auth-submit-btn" style="width: 100%; justify-content: center; padding: 0.95rem; font-size: 1.05rem;">
+              <span>🚀</span> Create Account & Claim 500 Tokens
+            </button>
+          </form>
+
+          <!-- Quick Guest Demo Button -->
+          <button class="btn-guest-demo" type="button" id="auth-guest-demo-btn">
+            <span>⚡</span> Explore as Guest Demo (Quick Access)
+          </button>
+
+          <div style="margin-top: 1.4rem; font-size: 0.78rem; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+            <span>🔒</span> 256-Bit Encrypted Session • SafarSetu Travel Portal
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW 1: HOME PAGE (#home)
+    ======================================================== -->
+    <section class="page-view" id="view-home">
+      <!-- Nature Forest Hero Stage with Dynamic Reactive Background Engine -->
+      <div class="hero-netflix-stage" id="hero-netflix-stage">
+        <!-- Dynamic Crossfade Background Layers -->
+        <div class="hero-bg-layer hero-bg-active" id="hero-bg-layer-1" style="background-image: url('https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=1920&q=85');"></div>
+        <div class="hero-bg-layer" id="hero-bg-layer-2"></div>
+        
+        <!-- Protective Dark Vignette Gradient (Requirement 3) -->
+        <div class="hero-gradient-overlay"></div>
+
+        <div class="hero-overlay-content">
+          <div class="hero-pill-tag" id="hero-active-region-pill">
+            <span>🌿</span> SafarSetu • Discover the Soul of India
+          </div>
+          <h1 class="hero-headline">
+            Discover Incredible India with <span class="glow-accent">SafarSetu</span>
+          </h1>
+          <p class="hero-subhead">
+            Multi-modal transit booking (Vande Bharat & EV buses), verified heritage stays, real-time mountain landslide alerts, and direct GI-tagged artisan craft marketplace.
+          </p>
+
+          <!-- Dynamic Any-Destination Global Search Engine Bar -->
+          <div class="global-search-wrapper">
+            <div class="search-field-unit">
+              <span style="font-size: 1.2rem;">📍</span>
+              <input type="text" id="home-dest-input" placeholder="Type ANY Destination (e.g., Manali, Varanasi, Jaipur, Munnar, Goa, Udaipur)..." aria-label="Destination">
+            </div>
+            <div class="search-field-unit" style="max-width: 170px;">
+              <span style="font-size: 1.2rem;">🎒</span>
+              <select id="home-style-select" aria-label="Travel Style">
+                <option value="eco">🌿 Eco-Explorer</option>
+                <option value="backpacker">🎒 Backpacker</option>
+                <option value="luxury">💎 Luxury Stays</option>
+                <option value="family">👨‍👩‍👧 Family Friendly</option>
+                <option value="culture">🧘 Solo Culture</option>
+              </select>
+            </div>
+            <div class="search-field-unit" style="max-width: 130px;">
+              <span style="font-size: 1.2rem;">📅</span>
+              <select id="home-days-select" aria-label="Duration in Days">
+                <option value="2">2 Days</option>
+                <option value="3" selected>3 Days</option>
+                <option value="5">5 Days</option>
+                <option value="7">7 Days</option>
+                <option value="10">10 Days</option>
+              </select>
+            </div>
+            <button class="btn-primary-action" id="home-search-btn">
+              <span>🚀</span> Plan Itinerary
+            </button>
+          </div>
+
+          <!-- Quick Suggestion City Chips -->
+          <div class="quick-pills-row">
+            <span>Popular Destinations:</span>
+            <button class="quick-city-chip" data-dest="Manali">🏔️ Manali (Mountain Safety)</button>
+            <button class="quick-city-chip" data-dest="Shimla">🌲 Shimla</button>
+            <button class="quick-city-chip" data-dest="Goa">🏖️ Goa</button>
+            <button class="quick-city-chip" data-dest="Varanasi">🕉️ Varanasi</button>
+            <button class="quick-city-chip" data-dest="Jaipur">🏰 Jaipur</button>
+            <button class="quick-city-chip" data-dest="Munnar">🍵 Munnar</button>
+            <button class="quick-city-chip" data-dest="Udaipur">🕌 Udaipur</button>
+            <button class="quick-city-chip" data-dest="Srinagar">❄️ Srinagar</button>
+          </div>
+        </div>
+
+        <!-- Carousel Status Badge & Slide Dots -->
+        <div class="hero-carousel-controls">
+          <div class="hero-carousel-badge" id="hero-carousel-status">
+            <span class="live-dot-pulse"></span>
+            <span id="hero-carousel-label">Himalayas • Pine Peaks</span>
+          </div>
+          <div class="hero-carousel-dots" id="hero-carousel-dots">
+            <button class="hero-carousel-dot active" data-slide-index="0" title="Himalayas (Manali)"></button>
+            <button class="hero-carousel-dot" data-slide-index="1" title="Kerala Lagoons"></button>
+            <button class="hero-carousel-dot" data-slide-index="2" title="Rajasthan Palaces"></button>
+            <button class="hero-carousel-dot" data-slide-index="3" title="Varanasi Ghats"></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Hazard & Innovation Ticker -->
+      <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 0.9rem 1.4rem; margin-bottom: 3rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+        <div style="display: flex; align-items: center; gap: 0.8rem;">
+          <span style="background: var(--caramel); color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 800;">LIVE DISPATCH</span>
+          <span style="font-size: 0.88rem; color: var(--text-secondary);" id="live-dispatch-ticker">
+            🛰️ Satellite telemetry active: High precipitation over Rohtang Pass. Automated anti-crowd diversion engaged.
+          </span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 1.2rem; font-size: 0.82rem; font-family: var(--font-mono);">
+          <span style="color: var(--sage);">● Carbon Offset: 142.8 MT</span>
+          <span style="color: var(--amber);">● 1,840 Eco-Vouchers Issued</span>
+        </div>
+      </div>
+
+      <!-- HORIZONTAL CAROUSEL 1: Trending Low-Crowd Hidden Gems -->
+      <section class="carousel-section">
+        <div class="carousel-header-row">
+          <div>
+            <h2 class="carousel-title">
+              Trending Low-Crowd <span class="tag-glow">Hidden Gems</span>
+            </h2>
+            <p style="font-size: 0.88rem; color: var(--text-secondary); margin-top: 0.2rem;">
+              Divert from congested hotspots to pristine sanctuaries & earn bonus Eco-Tokens.
+            </p>
+          </div>
+          <div class="carousel-controls">
+            <button class="carousel-nav-btn" onclick="scrollCarousel('gems-track', -340)" aria-label="Previous">←</button>
+            <button class="carousel-nav-btn" onclick="scrollCarousel('gems-track', 340)" aria-label="Next">→</button>
+          </div>
+        </div>
+        <div class="horizontal-carousel-track" id="gems-track">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </section>
+
+      <!-- HORIZONTAL CAROUSEL 2: Eco-Resorts & Smart Stays -->
+      <section class="carousel-section">
+        <div class="carousel-header-row">
+          <div>
+            <h2 class="carousel-title">
+              Eco-Resorts & <span class="tag-glow">Smart Stays</span>
+            </h2>
+            <p style="font-size: 0.88rem; color: var(--text-secondary); margin-top: 0.2rem;">
+              Dynamic off-peak pricing cuts rates up to 40% while unlocking village artisan masterclasses.
+            </p>
+          </div>
+          <div class="carousel-controls">
+            <button class="carousel-nav-btn" onclick="scrollCarousel('stays-track', -340)" aria-label="Previous">←</button>
+            <button class="carousel-nav-btn" onclick="scrollCarousel('stays-track', 340)" aria-label="Next">→</button>
+          </div>
+        </div>
+        <div class="horizontal-carousel-track" id="stays-track">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </section>
+
+      <!-- HORIZONTAL CAROUSEL 3: Direct GI-Tagged Artisan Masterpieces -->
+      <section class="carousel-section">
+        <div class="carousel-header-row">
+          <div>
+            <h2 class="carousel-title">
+              Authentic <span class="tag-glow">GI-Tagged Crafts</span> & Street Heritage
+            </h2>
+            <p style="font-size: 0.88rem; color: var(--text-secondary); margin-top: 0.2rem;">
+              100% direct-to-artisan revenue with verifiable Government GI QR authenticity certificates.
+            </p>
+          </div>
+          <div class="carousel-controls">
+            <button class="carousel-nav-btn" onclick="scrollCarousel('market-track', -340)" aria-label="Previous">←</button>
+            <button class="carousel-nav-btn" onclick="scrollCarousel('market-track', 340)" aria-label="Next">→</button>
+          </div>
+        </div>
+        <div class="horizontal-carousel-track" id="market-track">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </section>
+
+      <!-- SafarSetu Core Experience Pillars -->
+      <section style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 2.5rem; margin-top: 2rem;">
+        <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem; text-align: center;">
+          Why Travelers Choose SafarSetu
+        </h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem;">
+          <div style="background: var(--bg-secondary); padding: 1.4rem; border-radius: var(--radius-lg); border-left: 3px solid #B91C1C;">
+            <h4 style="font-size: 1.1rem; margin-bottom: 0.4rem; color: #FCA5A5;">🚨 Mountain Landslide Engine</h4>
+            <p style="font-size: 0.86rem; color: var(--text-secondary);">
+              Automated hazard triggers for high-altitude passes during rainfall spikes with +100 Eco-Token safety reroute incentives.
+            </p>
+          </div>
+          <div style="background: var(--bg-secondary); padding: 1.4rem; border-radius: var(--radius-lg); border-left: 3px solid var(--sage);">
+            <h4 style="font-size: 1.1rem; margin-bottom: 0.4rem; color: var(--sage);">🌐 All-India Dynamic Planner</h4>
+            <p style="font-size: 0.86rem; color: var(--text-secondary);">
+              Dynamic day-by-day itinerary generation across Indian circuits with automatic geocoding & interactive route mapping.
+            </p>
+          </div>
+          <div style="background: var(--bg-secondary); padding: 1.4rem; border-radius: var(--radius-lg); border-left: 3px solid var(--caramel);">
+            <h4 style="font-size: 1.1rem; margin-bottom: 0.4rem; color: var(--caramel);">📉 Dynamic Off-Peak Stays</h4>
+            <p style="font-size: 0.86rem; color: var(--text-secondary);">
+              Interactive occupancy slider redistributes visitor pressure, providing automatic hotel discounts and masterclass perks.
+            </p>
+          </div>
+          <div style="background: var(--bg-secondary); padding: 1.4rem; border-radius: var(--radius-lg); border-left: 3px solid var(--amber);">
+            <h4 style="font-size: 1.1rem; margin-bottom: 0.4rem; color: var(--amber);">📜 GI-Tag Authenticity Registry</h4>
+            <p style="font-size: 0.86rem; color: var(--text-secondary);">
+              Direct economic empowerment of rural master craftspersons with verifiable QR provenance certificates.
+            </p>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <!-- ========================================================
+         VIEW 2: TRIP PLANNER (#planner)
+    ======================================================== -->
+    <section class="page-view" id="view-planner">
+      <div style="margin-bottom: 2rem;">
+        <h1 style="font-size: 2.2rem; font-weight: 800; letter-spacing: -0.02em;">
+          Trip Planner & <span class="text-caramel">Itineraries</span>
+        </h1>
+        <p style="color: var(--text-secondary); font-size: 0.95rem;">
+          Generate custom day-by-day itineraries across popular Indian destinations with live weather alerts and interactive GPS mapping.
+        </p>
+      </div>
+
+      <!-- Controls & Filter Form -->
+      <div class="planner-controls-card">
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.2rem;">
+          <div style="flex: 2; min-width: 260px;">
+            <label style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">
+              TYPE ANY DESTINATION:
+            </label>
+            <input type="text" id="planner-dest-input" value="Manali" style="width: 100%; background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 0.75rem 1rem; font-size: 1.05rem;" placeholder="e.g. Manali, Varanasi, Jaipur, Munnar, Goa, Udaipur, Srinagar...">
+          </div>
+          <div style="flex: 1; min-width: 150px;">
+            <label style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">
+              TRIP DURATION:
+            </label>
+            <select id="planner-days-select" style="width: 100%; background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 0.75rem 1rem; font-size: 1rem;">
+              <option value="1">1 Day Express</option>
+              <option value="2">2 Days</option>
+              <option value="3" selected>3 Days</option>
+              <option value="4">4 Days</option>
+              <option value="5">5 Days</option>
+              <option value="7">7 Days</option>
+            </select>
+          </div>
+          <div style="display: flex; align-items: flex-end;">
+            <button class="btn-primary-action" id="planner-regenerate-btn" style="height: 48px;">
+              <span>⚡</span> Generate Custom Itinerary
+            </button>
+          </div>
+        </div>
+
+        <!-- Travel Style Chips -->
+        <div>
+          <label style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); display: block;">
+            TRAVEL STYLE:
+          </label>
+          <div class="filters-button-group" id="planner-style-chips">
+            <button class="filter-chip-btn active" data-style="eco">🌿 Eco-Explorer</button>
+            <button class="filter-chip-btn" data-style="backpacker">🎒 Budget Backpacker</button>
+            <button class="filter-chip-btn" data-style="luxury">💎 Sustainable Luxury</button>
+            <button class="filter-chip-btn" data-style="family">👨‍👩‍👧 Family Friendly</button>
+            <button class="filter-chip-btn" data-style="culture">🧘 Solo Cultural</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Weather Intelligence Card -->
+      <div class="weather-intelligence-banner" id="planner-weather-widget">
+        <div class="weather-metric-group">
+          <div style="font-size: 2.5rem;" id="weather-icon">🌧️</div>
+          <div>
+            <div class="weather-temp-big" id="weather-temp">14°C</div>
+            <div style="font-size: 0.88rem; color: var(--text-secondary);" id="weather-condition">Heavy Rain & Mountain Mist</div>
+          </div>
+        </div>
+        <div class="weather-stats-list">
+          <div class="weather-stat-item">
+            <span>💧</span>
+            <div>Rain Prob: <strong id="weather-rain">88%</strong></div>
+          </div>
+          <div class="weather-stat-item">
+            <span>💨</span>
+            <div>Wind: <strong id="weather-wind">28 km/h</strong></div>
+          </div>
+          <div class="weather-stat-item">
+            <span>🍃</span>
+            <div>AQI: <strong id="weather-aqi" style="color: var(--sage);">22 (Clean)</strong></div>
+          </div>
+          <div class="weather-stat-item">
+            <span>🛡️</span>
+            <div>Safety: <strong id="weather-safety-status" style="color: #FCA5A5;">Landslide Alert</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Anti-Crowd Live Alert Card -->
+      <div class="anti-crowd-alert-card" id="anti-crowd-widget">
+        <div style="display: flex; align-items: center; gap: 0.8rem;">
+          <span style="font-size: 1.8rem;">⚠️</span>
+          <div>
+            <div style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary);" id="anti-crowd-title">
+              Rohtang Pass is at 94% Capacity!
+            </div>
+            <div style="font-size: 0.82rem; color: var(--text-secondary);" id="anti-crowd-desc">
+              Divert to Sethan Buddhist Sanctuary and avoid 2-hour bottleneck queues.
+            </div>
+          </div>
+        </div>
+        <button class="anti-crowd-btn" id="anti-crowd-divert-btn">
+          ✨ Divert to Hidden Gem & Earn +80 Tokens
+        </button>
+      </div>
+
+      <!-- Two-Column Layout: Timeline Builder & Interactive Leaflet Route Map -->
+      <div class="planner-grid-layout">
+        <!-- Left: Day-by-Day Timeline Builder -->
+        <div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+            <h3 style="font-size: 1.3rem;">Day-by-Day Itinerary Schedule</h3>
+            <div style="display: flex; gap: 0.6rem;">
+              <button class="btn-emerald-action" id="btn-save-itinerary" style="padding: 0.4rem 0.9rem; font-size: 0.82rem;">
+                💾 Save Itinerary
+              </button>
+            </div>
+          </div>
+
+          <div class="timeline-builder-wrapper" id="timeline-schedule-container">
+            <!-- Populated dynamically via JS -->
+          </div>
+        </div>
+
+        <!-- Right: Leaflet Interactive Map -->
+        <div>
+          <div class="map-sticky-panel">
+            <div class="map-header-bar">
+              <div>
+                <h4 style="font-size: 1.05rem;" id="map-destination-title">Interactive Route Map: Manali</h4>
+                <p style="font-size: 0.78rem; color: var(--text-secondary);">
+                  Dynamic GPS centering, eco-pins & hazard avoidance zones
+                </p>
+              </div>
+              <span class="terrain-safety-badge badge-extreme-hazard" id="map-terrain-badge">🔴 Mountain Hazard</span>
+            </div>
+            <div id="leaflet-route-map"></div>
+            <div class="map-legend-bar">
+              <span>🔵 Safe Activity Pin</span>
+              <span>🟢 Hidden Gem (+Tokens)</span>
+              <span>🔴 Landslide Danger Zone</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW 3: MULTI-MODAL TRANSIT ENGINE (#transit)
+    ======================================================== -->
+    <section class="page-view" id="view-transit">
+      <div style="margin-bottom: 2rem;">
+        <h1 style="font-size: 2.2rem; font-weight: 800; letter-spacing: -0.02em;">
+          Multi-Modal Transit & <span class="text-sage">Eco-Pass Booking</span>
+        </h1>
+        <p style="color: var(--text-secondary); font-size: 0.95rem;">
+          Low-carbon electric express trains, solar EV bus pools, and carbon-offset flights awarding bonus Eco-Tokens.
+        </p>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="transit-filter-tabs">
+        <button class="filter-chip-btn active" data-type="all">All Modes</button>
+        <button class="filter-chip-btn" data-type="train">🚆 Electric Trains (-78% CO2)</button>
+        <button class="filter-chip-btn" data-type="bus">🚌 Solar EV Bus Pools</button>
+        <button class="filter-chip-btn" data-type="flight">✈️ Biofuel SAF Flights</button>
+      </div>
+
+      <!-- Transit Cards Grid -->
+      <div class="transit-grid-list" id="transit-cards-container">
+        <!-- Populated dynamically via JS -->
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW 4: SMART STAYS & DYNAMIC OCCUPANCY (#hotels)
+    ======================================================== -->
+    <section class="page-view" id="view-hotels">
+      <div style="margin-bottom: 2rem;">
+        <h1 style="font-size: 2.2rem; font-weight: 800; letter-spacing: -0.02em;">
+          Smart Stays & <span class="text-caramel">Dynamic Pricing Engine</span>
+        </h1>
+        <p style="color: var(--text-secondary); font-size: 0.95rem;">
+          Certified eco-resorts, passive-solar mud cottages, and heritage homestays. Adjust the occupancy slider below to unlock dynamic off-peak discounts!
+        </p>
+      </div>
+
+      <!-- Interactive Off-Peak Occupancy Slider Engine -->
+      <div class="occupancy-yield-engine">
+        <div class="yield-engine-header">
+          <div>
+            <h3 style="font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+              <span>📉</span> Live Off-Peak Occupancy Balancer
+            </h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary);">
+              Slide to simulate destination hotel occupancy rate. Lower occupancy earns greater dynamic discounts!
+            </p>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 0.75rem; color: var(--text-muted);">CURRENT DESTINATION OCCUPANCY</div>
+            <div style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 900; color: var(--sage);" id="occupancy-display">
+              50% (Balanced)
+            </div>
+          </div>
+        </div>
+
+        <div class="slider-container">
+          <input type="range" min="15" max="95" value="50" step="5" class="occupancy-range-slider" id="occupancy-slider" aria-label="Occupancy Slider">
+          <div class="slider-scale-labels">
+            <span>15% (Ultra Off-Peak: 35% Off)</span>
+            <span>50% (Standard Off-Peak: 25% Off)</span>
+            <span>75% (Moderate)</span>
+            <span>95% (Peak Season)</span>
+          </div>
+        </div>
+
+        <!-- Masterclass Perk Unlocked Banner -->
+        <div class="yield-perks-unlocked" id="occupancy-perk-banner">
+          <span>🎁</span>
+          <span id="occupancy-perk-text">
+            Off-Peak Rate Active! Unlocks <strong>Free Village Artisan Masterclass</strong> with every stay reservation!
+          </span>
+        </div>
+      </div>
+
+      <!-- Stays Filter Tabs -->
+      <div style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+        <button class="filter-chip-btn active" data-stay="all">All Stays</button>
+        <button class="filter-chip-btn" data-stay="eco-resort">Solar Eco-Resorts</button>
+        <button class="filter-chip-btn" data-stay="heritage-homestay">Heritage Kath-Kuni Homestays</button>
+        <button class="filter-chip-btn" data-stay="glamping">Geodesic Glamping Domes</button>
+      </div>
+
+      <!-- Stays Grid -->
+      <div class="stays-grid-container" id="stays-grid-container">
+        <!-- Populated dynamically via JS -->
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW 5: HYPER-LOCAL FOOD & GI ARTISAN MARKET (#food-market)
+    ======================================================== -->
+    <section class="page-view" id="view-food-market">
+      <div style="margin-bottom: 2rem;">
+        <h1 style="font-size: 2.2rem; font-weight: 800; letter-spacing: -0.02em;">
+          Hyper-Local Food, <span class="text-sage">GI Artisans</span> & Storytellers
+        </h1>
+        <p style="color: var(--text-secondary); font-size: 0.95rem;">
+          Direct-to-artisan revenue with 0% middleman cut. Every handicraft includes a verifiable Government of India GI-Tag certificate.
+        </p>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div class="market-category-pills">
+        <button class="filter-chip-btn active" data-cat="all">All Categories</button>
+        <button class="filter-chip-btn" data-cat="food">🍲 Heritage Street Food</button>
+        <button class="filter-chip-btn" data-cat="handicraft">🎨 GI-Tagged Handicrafts</button>
+        <button class="filter-chip-btn" data-cat="guide">🧭 Certified Local Guides</button>
+        <button class="filter-chip-btn" data-cat="rickshaw">🛺 Solar E-Rickshaws</button>
+      </div>
+
+      <!-- Market Grid -->
+      <div class="market-grid-container" id="market-grid-container">
+        <!-- Populated dynamically via JS -->
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW 6: SAFARSETU PRO PRICING TIER (#pricing)
+    ======================================================== -->
+    <section class="page-view" id="view-pricing">
+      <div class="pricing-hero-head">
+        <span class="hero-pill-tag">VIP SUSTAINABLE PASS</span>
+        <h1 style="font-size: 2.8rem; font-weight: 900; margin-bottom: 0.8rem;">
+          Supercharge Your Journey with <span style="color: var(--amber);">SafarSetu PRO</span>
+        </h1>
+        <p style="color: var(--text-secondary); font-size: 1.05rem;">
+          Priority anti-crowd alerts 30 minutes early, 2x Eco-Token rewards, exclusive 15% off-peak stay discounts, and emergency mountain evacuation protection.
+        </p>
+      </div>
+
+      <div class="pricing-plans-grid">
+        <!-- Explorer (Free Tier) -->
+        <div class="plan-card">
+          <h3 style="font-size: 1.4rem;">Explorer</h3>
+          <p style="color: var(--text-secondary); font-size: 0.88rem; margin-top: 0.2rem;">
+            Standard sustainable itinerary planning & eco-discovery.
+          </p>
+          <div class="plan-price-big">
+            ₹0 <small style="font-size: 1rem; color: var(--text-muted); font-weight: 400;">/ forever</small>
+          </div>
+          <ul class="plan-features-list">
+            <li class="plan-feature-row"><span>✓</span> Standard any-destination itineraries</li>
+            <li class="plan-feature-row"><span>✓</span> Standard Eco-Token earning rate (1x)</li>
+            <li class="plan-feature-row"><span>✓</span> Basic hotel dynamic off-peak discounts</li>
+            <li class="plan-feature-row"><span>✓</span> Standard mountain landslide hazard alerts</li>
+            <li class="plan-feature-row" style="opacity: 0.5;"><span>🔒</span> Priority crowd spike warnings</li>
+            <li class="plan-feature-row" style="opacity: 0.5;"><span>🔒</span> VIP artisan private masterclasses</li>
+            <li class="plan-feature-row" style="opacity: 0.5;"><span>🔒</span> 24/7 Priority Emergency SOS dispatch</li>
+          </ul>
+          <button class="btn-emerald-action" style="width: 100%; justify-content: center; background: rgba(255,255,255,0.06); box-shadow: none;" disabled>
+            Current Standard Plan
+          </button>
+        </div>
+
+        <!-- SafarSetu PRO / VIP Pass -->
+        <div class="plan-card pro-featured">
+          <div class="plan-ribbon-tag">MOST POPULAR • SUSTAINABLE VIP</div>
+          <h3 style="font-size: 1.6rem; color: var(--amber); display: flex; align-items: center; gap: 0.4rem;">
+            <span>👑</span> SafarSetu PRO
+          </h3>
+          <p style="color: var(--text-secondary); font-size: 0.88rem; margin-top: 0.2rem;">
+            VIP perks, maximum token multipliers & disaster rescue.
+          </p>
+          <div class="plan-price-big" style="color: var(--amber);">
+            ₹299 <small style="font-size: 1rem; color: var(--text-muted); font-weight: 400;">/ month or ₹2,499 / year</small>
+          </div>
+          <ul class="plan-features-list">
+            <li class="plan-feature-row"><span>⚡</span> <strong>Priority Anti-Crowd Rerouting:</strong> Alerts 30 mins before major queues form</li>
+            <li class="plan-feature-row"><span>💸</span> <strong>Extra 15% Dynamic Discount</strong> on all partner eco-resorts</li>
+            <li class="plan-feature-row"><span>🚀</span> <strong>2x Eco-Token Multiplier</strong> on transit and artisan orders</li>
+            <li class="plan-feature-row"><span>🛡️</span> <strong>Priority Emergency SOS:</strong> Real-time mountain landslide evacuation routing</li>
+            <li class="plan-feature-row"><span>🎟️</span> <strong>VIP Fast-Track:</strong> Exclusive artisan masterclasses & heritage skips</li>
+            <li class="plan-feature-row"><span>🎁</span> <strong>+200 Welcome Bonus Eco-Tokens</strong> credited instantly</li>
+          </ul>
+          <button class="pro-upgrade-btn" id="btn-subscribe-pro-action" style="width: 100%; justify-content: center; padding: 0.9rem; font-size: 1rem;">
+            <span>👑</span> Upgrade to SafarSetu PRO (₹299)
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         VIEW 7: PROFILE HUB (#profile)
+    ======================================================== -->
+    <section class="page-view" id="view-profile">
+      <!-- Profile Header Banner -->
+      <div class="profile-hero-card">
+        <div class="profile-identity-group">
+          <div class="profile-avatar-wrapper" id="profile-avatar-wrapper" title="Click to customize avatar or upload photo">
+            <img class="profile-avatar-big" id="profile-page-avatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80" alt="Avatar">
+            <button class="avatar-edit-overlay-btn" id="btn-edit-avatar-overlay" aria-label="Edit Profile Picture" title="Change Avatar">📷</button>
+          </div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <h2 style="font-size: 1.6rem;" id="profile-user-name">Aarav Sharma</h2>
+              <span class="pro-upgrade-btn is-active-pro" id="profile-pro-badge" style="display: none; padding: 2px 8px; font-size: 0.72rem;">PRO VIP</span>
+            </div>
+            <div style="font-size: 0.88rem; color: var(--text-secondary);" id="profile-user-email">aarav.sharma@safarsetu.in</div>
+            <div style="margin-top: 0.35rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+              <span class="brand-badge" id="profile-role-tag">ROLE: TOURIST</span>
+              <span style="font-size: 0.8rem; color: var(--sage);" id="profile-tier-tag">Gold Eco-Explorer</span>
+              <button class="filter-chip-btn" id="btn-open-avatar-picker-modal" style="font-size: 0.76rem; padding: 0.2rem 0.65rem; border-color: var(--emerald); color: var(--emerald);">
+                <span>📷</span> Edit Profile Picture
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.8rem; flex-wrap: wrap;">
+          <button class="btn-emerald-action" id="btn-redeem-token-voucher">
+            <span>🎟️</span> Redeem Tokens for Voucher
+          </button>
+          <button class="filter-chip-btn" id="btn-switch-account-modal">
+            <span>🔄</span> Switch Persona
+          </button>
+          <button class="filter-chip-btn" id="btn-logout-profile" style="border-color: #B91C1C; color: #ff8c8c;">
+            <span>🚪</span> Sign Out
+          </button>
+        </div>
+      </div>
+
+      <!-- Sustainability Metrics Summary Grid -->
+      <div class="metrics-summary-grid">
+        <div class="metric-stat-box">
+          <div style="font-size: 0.82rem; color: var(--text-muted); font-weight: 700;">TOTAL CARBON SAVED</div>
+          <div class="metric-number-huge text-sage" id="metric-carbon-saved">168.4 kg</div>
+          <div style="font-size: 0.78rem; color: var(--text-secondary);">Equivalent to 8 native pine trees planted</div>
+        </div>
+        <div class="metric-stat-box">
+          <div style="font-size: 0.82rem; color: var(--text-muted); font-weight: 700;">ECO-TOKENS WALLET</div>
+          <div class="metric-number-huge text-caramel" id="metric-tokens-wallet">500</div>
+          <div style="font-size: 0.78rem; color: var(--text-secondary);">Worth ₹1,000 in stay & masterclass credits</div>
+        </div>
+        <div class="metric-stat-box">
+          <div style="font-size: 0.82rem; color: var(--text-muted); font-weight: 700;">OFFBEAT DISCOVERIES</div>
+          <div class="metric-number-huge" style="color: var(--amber);" id="metric-offbeat-count">8</div>
+          <div style="font-size: 0.78rem; color: var(--text-secondary);">Hidden sanctuaries explored</div>
+        </div>
+        <div class="metric-stat-box">
+          <div style="font-size: 0.82rem; color: var(--text-muted); font-weight: 700;">SUSTAINABILITY RANK</div>
+          <div class="metric-number-huge" style="color: var(--caramel);">Top 5%</div>
+          <div style="font-size: 0.78rem; color: var(--text-secondary);">Gold Eco-Citizen Tier</div>
+        </div>
+      </div>
+
+      <!-- My Active Bookings Section -->
+      <div style="margin-bottom: 3rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem;">
+          <h3 style="font-size: 1.4rem; font-weight: 800;">
+            My Active Bookings & <span class="text-caramel">Trip History</span>
+          </h3>
+          <span style="font-size: 0.85rem; color: var(--text-muted);" id="bookings-count-badge">2 Active</span>
+        </div>
+        <div class="bookings-history-list" id="bookings-container">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+
+      <!-- Saved Itineraries Section -->
+      <div>
+        <h3 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 1.2rem;">
+          Saved Custom Itineraries
+        </h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.2rem;" id="saved-itineraries-container">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+
+      <!-- Danger Zone: Account Deletion & Wipe Data -->
+      <div class="profile-danger-zone">
+        <div class="danger-zone-content">
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.3rem;">
+            <span style="font-size: 1.3rem;">⚠️</span>
+            <h4 style="font-size: 1.15rem; font-weight: 800; color: #FCA5A5;">Danger Zone: Account & Data Deletion</h4>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45;">
+            Permanently erase your SafarSetu account, wipe all active hotel and transit reservations, clear saved itineraries, and forfeit accumulated Eco-Tokens. This action is irreversible.
+          </p>
+        </div>
+        <button class="btn-danger-wipe" id="btn-trigger-delete-account">
+          <span>🗑️</span> Delete Account & Wipe Data
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================
+       GLOBAL MODAL 1: REALISTIC MULTI-STEP CHECKOUT GATEWAY
+  ======================================================== -->
+  <div class="modal-overlay" id="modal-checkout">
+    <div class="modal-content-box checkout-modal-box" role="dialog" aria-modal="true" aria-labelledby="modal-booking-title">
+      <button class="modal-close-x" id="modal-checkout-close" aria-label="Close modal">×</button>
+      
+      <!-- STEP 1: ORDER SUMMARY & INTERACTIVE PAYMENT METHODS -->
+      <div id="checkout-form-view">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span class="hero-pill-tag" id="checkout-item-badge">SMART STAY</span>
+            <span class="secure-badge-pill">🔒 256-Bit SSL Encrypted • NPCI Verified</span>
+          </div>
+        </div>
+
+        <h3 id="modal-booking-title" style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.3rem;">
+          Secure SafarSetu Checkout
+        </h3>
+        <p style="font-size: 0.86rem; color: var(--text-secondary);" id="checkout-item-subtitle">
+          Himalayan Solar Sanctuary & Apple Orchard Lodge
+        </p>
+
+        <!-- Booking Parameters Review -->
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 0.9rem 1rem; margin: 1rem 0; display: flex; gap: 1rem; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 140px;">
+            <label style="font-size: 0.74rem; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 0.25rem;">TRAVEL DATES / DURATION</label>
+            <input type="text" id="checkout-date-input" value="Oct 14 - Oct 17, 2026" style="width: 100%; background: transparent; border: 1px solid var(--border-subtle); border-radius: 4px; padding: 0.4rem 0.6rem; font-size: 0.88rem; color: var(--text-primary);">
+          </div>
+          <div style="width: 110px;" id="checkout-guests-group">
+            <label style="font-size: 0.74rem; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 0.25rem;">PASSENGERS / PAX</label>
+            <input type="number" id="checkout-guests-input" value="2" min="1" max="10" style="width: 100%; background: transparent; border: 1px solid var(--border-subtle); border-radius: 4px; padding: 0.4rem 0.6rem; font-size: 0.88rem; color: var(--text-primary);">
+          </div>
+        </div>
+
+        <!-- Eco-Tokens Redemption Slider -->
+        <div style="background: var(--sage-subtle); border: 1px solid rgba(52, 211, 153, 0.3); border-radius: var(--radius-md); padding: 0.9rem 1rem; margin-bottom: 1rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+            <span style="font-size: 0.84rem; font-weight: 700; color: var(--sage);">Redeem Eco-Tokens for Instant Discount</span>
+            <span style="font-family: var(--font-mono); font-size: 0.86rem; font-weight: 800; color: var(--sage);" id="checkout-token-redeem-count">0 Tokens (₹0 off)</span>
+          </div>
+          <input type="range" id="checkout-token-slider" min="0" max="200" value="0" step="10" style="width: 100%; accent-color: var(--sage); cursor: pointer;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--sage); margin-top: 0.25rem;">
+            <span>0 Tokens</span>
+            <span id="checkout-wallet-max">Available: 500 Tokens</span>
+          </div>
+        </div>
+
+        <!-- Transparent Cost Breakdown Table -->
+        <table class="cost-breakdown-table" style="margin: 0.8rem 0 1rem 0;">
+          <tbody>
+            <tr>
+              <td>Base Amount</td>
+              <td style="text-align: right;" id="breakdown-base-price">₹4,200</td>
+            </tr>
+            <tr id="breakdown-row-discount">
+              <td>Dynamic Off-Peak Savings</td>
+              <td style="text-align: right; color: var(--sage);" id="breakdown-discount-saved">- ₹1,050</td>
+            </tr>
+            <tr>
+              <td>Eco-Token Discount (1 Token = ₹2)</td>
+              <td style="text-align: right; color: var(--sage);" id="breakdown-token-discount">- ₹0</td>
+            </tr>
+            <tr>
+              <td id="breakdown-taxes-label">Taxes & GST (5% Sustainable Tourism Cess)</td>
+              <td style="text-align: right;" id="breakdown-taxes">₹158</td>
+            </tr>
+            <tr class="total-row">
+              <td>Final Payable Amount</td>
+              <td style="text-align: right; color: var(--text-primary); font-family: var(--font-heading);" id="breakdown-total-price">₹3,308</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Token Reward Preview -->
+        <div style="background: var(--caramel-subtle); border: 1px dashed var(--caramel); border-radius: var(--radius-md); padding: 0.65rem 1rem; margin-bottom: 1.2rem; display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-size: 0.82rem; color: var(--text-secondary);">Eco-Tokens Awarded on Completion:</span>
+          <span style="font-family: var(--font-mono); font-weight: 800; color: var(--caramel);" id="checkout-reward-preview">+120 Tokens</span>
+        </div>
+
+        <!-- Payment Method Tabs -->
+        <div style="margin-bottom: 0.4rem;">
+          <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Select Payment Gateway</label>
+        </div>
+
+        <div class="payment-tabs-bar" role="tablist">
+          <button class="pay-tab-btn active-tab" id="tab-btn-upi" type="button" role="tab" aria-selected="true">
+            <span>📱</span> UPI / QR Code
+          </button>
+          <button class="pay-tab-btn" id="tab-btn-card" type="button" role="tab" aria-selected="false">
+            <span>💳</span> Credit / Debit Card
+          </button>
+          <button class="pay-tab-btn" id="tab-btn-netbanking" type="button" role="tab" aria-selected="false">
+            <span>🏦</span> Net Banking
+          </button>
+        </div>
+
+        <!-- Tab 1: UPI / QR Code (Default) -->
+        <div class="pay-tab-pane active-pane" id="pane-pay-upi" role="tabpanel">
+          <div class="upi-content-grid">
+            <div class="qr-card-container">
+              <div class="qr-white-frame">
+                <img id="checkout-qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=upi%3A%2F%2Fpay%3Fpa%3Dsafarsetu%40icici%26pn%3DSafarSetu%2520India%26am%3D3308%26cu%3DINR" alt="UPI QR Code" style="width: 100%; height: 100%; display: block;">
+              </div>
+              <div class="qr-timer-pill" id="checkout-qr-timer">
+                <span>⏱️</span> <span>05:00 remaining</span>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-size: 0.82rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-secondary);">
+                Scan with any Indian UPI App:
+              </div>
+              <div class="upi-app-badges">
+                <div class="upi-app-chip selected" data-app="gpay">
+                  <span>🔵</span> Google Pay
+                </div>
+                <div class="upi-app-chip" data-app="phonepe">
+                  <span>🟣</span> PhonePe
+                </div>
+                <div class="upi-app-chip" data-app="paytm">
+                  <span>🔷</span> Paytm
+                </div>
+                <div class="upi-app-chip" data-app="bhim">
+                  <span>🇮🇳</span> BHIM
+                </div>
+              </div>
+
+              <div style="font-size: 0.8rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-secondary);">
+                Or Pay via UPI VPA / ID:
+              </div>
+              <div class="upi-id-input-group">
+                <input type="text" class="upi-id-input" id="checkout-upi-id-input" placeholder="aarav@oksbi" value="aarav@oksbi">
+                <button type="button" class="upi-verify-btn" id="btn-verify-upi-id">Verify</button>
+              </div>
+              <div class="upi-verify-status" id="upi-verify-feedback" style="display: flex;">
+                <span>✓</span> Verified: Aarav Sharma (State Bank of India)
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Credit / Debit Card -->
+        <div class="pay-tab-pane" id="pane-pay-card" role="tabpanel">
+          <div class="card-form-grid">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+                <label style="font-size: 0.76rem; color: var(--text-muted); font-weight: 700;">CARD NUMBER</label>
+                <span id="card-brand-badge" style="font-size: 0.74rem; font-family: var(--font-mono); color: var(--emerald);">💳 Visa / MasterCard / RuPay</span>
+              </div>
+              <input type="text" class="card-input-field mono" id="card-number-input" placeholder="4532 •••• •••• 8921" maxlength="19" value="4532 8820 1934 8921">
+            </div>
+
+            <div>
+              <label style="font-size: 0.76rem; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 0.3rem;">CARDHOLDER NAME</label>
+              <input type="text" class="card-input-field" id="card-name-input" placeholder="Aarav Sharma" value="Aarav Sharma">
+            </div>
+
+            <div class="card-row-split">
+              <div>
+                <label style="font-size: 0.76rem; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 0.3rem;">EXPIRY (MM/YY)</label>
+                <input type="text" class="card-input-field mono" id="card-expiry-input" placeholder="08/29" maxlength="5" value="08/29">
+              </div>
+              <div>
+                <label style="font-size: 0.76rem; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 0.3rem;">CVV / CVC</label>
+                <input type="password" class="card-input-field mono" id="card-cvv-input" placeholder="•••" maxlength="4" value="842">
+              </div>
+            </div>
+
+            <div style="font-size: 0.74rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.35rem;">
+              <span>🛡️</span> Protected by RBI-compliant end-to-end tokenized card vaults.
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Net Banking -->
+        <div class="pay-tab-pane" id="pane-pay-netbanking" role="tabpanel">
+          <div class="netbanking-form-box">
+            <div style="font-size: 0.8rem; font-weight: 700; margin-bottom: 0.6rem; color: var(--text-secondary);">
+              Popular Indian Scheduled Banks:
+            </div>
+            <div class="bank-grid">
+              <label class="bank-radio-card selected" for="bank-sbi">
+                <input type="radio" name="netbanking-bank" id="bank-sbi" value="State Bank of India" checked>
+                <div>
+                  <div class="bank-card-title">State Bank of India</div>
+                  <div style="font-size: 0.72rem; color: var(--text-muted);">Retail & Corporate</div>
+                </div>
+              </label>
+
+              <label class="bank-radio-card" for="bank-hdfc">
+                <input type="radio" name="netbanking-bank" id="bank-hdfc" value="HDFC Bank">
+                <div>
+                  <div class="bank-card-title">HDFC Bank</div>
+                  <div style="font-size: 0.72rem; color: var(--text-muted);">Fast NetBanking</div>
+                </div>
+              </label>
+
+              <label class="bank-radio-card" for="bank-icici">
+                <input type="radio" name="netbanking-bank" id="bank-icici" value="ICICI Bank">
+                <div>
+                  <div class="bank-card-title">ICICI Bank</div>
+                  <div style="font-size: 0.72rem; color: var(--text-muted);">iMobile / Retail</div>
+                </div>
+              </label>
+
+              <label class="bank-radio-card" for="bank-axis">
+                <input type="radio" name="netbanking-bank" id="bank-axis" value="Axis Bank">
+                <div>
+                  <div class="bank-card-title">Axis Bank</div>
+                  <div style="font-size: 0.72rem; color: var(--text-muted);">Instant Gateway</div>
+                </div>
+              </label>
+            </div>
+
+            <div style="font-size: 0.8rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-secondary);">
+              Or Select Another Bank:
+            </div>
+            <select class="bank-select-dropdown" id="bank-select-dropdown">
+              <option value="">-- Choose from 40+ Other Banks --</option>
+              <option value="Kotak Mahindra Bank">Kotak Mahindra Bank</option>
+              <option value="Punjab National Bank">Punjab National Bank</option>
+              <option value="Bank of Baroda">Bank of Baroda</option>
+              <option value="IndusInd Bank">IndusInd Bank</option>
+              <option value="Canara Bank">Canara Bank</option>
+              <option value="Union Bank of India">Union Bank of India</option>
+              <option value="IDFC FIRST Bank">IDFC FIRST Bank</option>
+              <option value="Yes Bank">Yes Bank</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; gap: 0.8rem; margin-top: 1.4rem;">
+          <button class="filter-chip-btn" id="btn-cancel-checkout" style="padding: 0.85rem 1.4rem;" type="button">
+            Cancel
+          </button>
+          <button class="btn-emerald-action" id="btn-trigger-payment-flow" style="flex: 1; justify-content: center; padding: 0.95rem; font-size: 1rem;" type="button">
+            <span>🔒</span> <span id="btn-pay-text-label">Pay ₹3,308 via UPI</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 2: SIMULATED 2-SECOND PROCESSING LOADER -->
+      <div class="checkout-processing-view" id="checkout-processing-view">
+        <div class="processing-spinner-ring"></div>
+        <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.4rem;">
+          Contacting Bank Gateway Securely...
+        </h3>
+        <p style="font-size: 0.9rem; color: var(--text-secondary); max-width: 440px; margin: 0 auto;" id="checkout-processing-subtext">
+          Establishing 256-bit encrypted handshake with your payment provider...
+        </p>
+
+        <div class="processing-step-meter">
+          <div class="processing-step-bar" id="checkout-processing-bar"></div>
+        </div>
+
+        <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 1rem;">
+          🛡️ RBI / NPCI Verified Gateway • Please do not close or refresh this page.
+        </div>
+      </div>
+
+      <!-- STEP 3: ANIMATED GREEN CHECKMARK SUCCESS RECEIPT -->
+      <div class="checkout-success-view" id="checkout-success-view">
+        <div class="success-checkmark-circle">✓</div>
+        <h3 style="font-size: 1.6rem; font-weight: 800; margin-bottom: 0.3rem; color: var(--emerald);">
+          Payment & Reservation Confirmed!
+        </h3>
+        <p style="font-size: 0.88rem; color: var(--text-secondary);">
+          Your sustainable travel booking is secured and synced to your profile.
+        </p>
+
+        <!-- Digital Receipt Box -->
+        <div class="receipt-card-box">
+          <div class="receipt-data-row">
+            <span style="color: var(--text-muted);">Transaction ID</span>
+            <span style="font-family: var(--font-mono); font-weight: 700; color: var(--sage);" id="receipt-txn-id">TXN-SETU-849204</span>
+          </div>
+          <div class="receipt-data-row">
+            <span style="color: var(--text-muted);">Date & Time</span>
+            <span id="receipt-timestamp">27 Sep 2026, 08:35 PM IST</span>
+          </div>
+          <div class="receipt-data-row">
+            <span style="color: var(--text-muted);">Item Reserved</span>
+            <span style="font-weight: 700;" id="receipt-item-title">Himalayan Solar Sanctuary</span>
+          </div>
+          <div class="receipt-data-row">
+            <span style="color: var(--text-muted);">Payment Method</span>
+            <span id="receipt-pay-method">UPI (aarav@oksbi)</span>
+          </div>
+          <div class="receipt-data-row">
+            <span style="color: var(--text-muted);">Eco-Tokens Balance</span>
+            <span style="color: var(--caramel); font-weight: 700;" id="receipt-token-change">+120 Tokens Awarded</span>
+          </div>
+          <div class="receipt-data-row">
+            <span style="font-size: 1rem; color: var(--text-primary);">Total Amount Paid</span>
+            <span style="font-size: 1.25rem; color: var(--emerald); font-family: var(--font-heading);" id="receipt-total-paid">₹3,308</span>
+          </div>
+        </div>
+
+        <!-- Receipt Actions -->
+        <div class="receipt-actions-grid">
+          <button class="filter-chip-btn" id="btn-download-receipt" style="flex: 1; justify-content: center; padding: 0.85rem;" type="button">
+            <span>📄</span> Download Tax Invoice / Receipt
+          </button>
+          <button class="btn-emerald-action" id="btn-success-view-bookings" style="flex: 1; justify-content: center; padding: 0.85rem;" type="button">
+            <span>👤</span> View in My Bookings
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       GLOBAL MODAL: AVATAR CUSTOMIZATION & PHOTO UPLOADER
+  ======================================================== -->
+  <div class="modal-overlay" id="modal-avatar-picker">
+    <div class="modal-content-box" style="max-width: 600px;" role="dialog" aria-modal="true" aria-labelledby="avatar-modal-title">
+      <button class="modal-close-x" id="modal-avatar-close" aria-label="Close modal">×</button>
+
+      <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem;">
+        <span class="hero-pill-tag" style="background: var(--sage-subtle); color: var(--sage); border-color: var(--sage);">
+          PROFILE CUSTOMIZATION
+        </span>
+      </div>
+
+      <h3 id="avatar-modal-title" style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.3rem;">
+        Customize Your Profile Avatar
+      </h3>
+      <p style="font-size: 0.86rem; color: var(--text-secondary); margin-bottom: 1.2rem;">
+        Upload a custom photo from your device or select from our curated sustainable travel personas.
+      </p>
+
+      <!-- Custom Photo Upload Dropzone -->
+      <input type="file" id="avatar-file-input" accept="image/*" style="display: none;">
+      <div class="avatar-upload-dropzone" id="avatar-dropzone" role="button" tabindex="0">
+        <div style="font-size: 2rem; margin-bottom: 0.4rem;">📁</div>
+        <div style="font-weight: 700; font-size: 0.92rem; color: var(--text-primary); margin-bottom: 0.2rem;">
+          Click to Upload Photo from Device
+        </div>
+        <div style="font-size: 0.78rem; color: var(--text-muted);">
+          Supports JPG, PNG, WEBP • Automatically optimized and synced to navigation bar
+        </div>
+      </div>
+
+      <!-- Preset Travel Avatars Grid -->
+      <div style="margin-bottom: 0.4rem;">
+        <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Or Choose a Travel Persona</label>
+      </div>
+
+      <div class="preset-avatars-grid" id="preset-avatars-grid">
+        <div class="preset-avatar-card selected-preset" data-avatar="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80" data-name="Mountain Trekker">
+          <img class="preset-avatar-img" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80" alt="Mountain Trekker">
+          <span class="preset-avatar-name">Mountain Trekker</span>
+          <span class="preset-avatar-tag">Highlands</span>
+        </div>
+
+        <div class="preset-avatar-card" data-avatar="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" data-name="Heritage Explorer">
+          <img class="preset-avatar-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" alt="Heritage Explorer">
+          <span class="preset-avatar-name">Heritage Explorer</span>
+          <span class="preset-avatar-tag">Culture</span>
+        </div>
+
+        <div class="preset-avatar-card" data-avatar="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80" data-name="Forest Backpacker">
+          <img class="preset-avatar-img" src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80" alt="Forest Backpacker">
+          <span class="preset-avatar-name">Forest Backpacker</span>
+          <span class="preset-avatar-tag">Eco-Camper</span>
+        </div>
+
+        <div class="preset-avatar-card" data-avatar="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=200&q=80" data-name="Solo Nomad">
+          <img class="preset-avatar-img" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=200&q=80" alt="Solo Nomad">
+          <span class="preset-avatar-name">Solo Nomad</span>
+          <span class="preset-avatar-tag">Expeditions</span>
+        </div>
+
+        <div class="preset-avatar-card" data-avatar="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&q=80" data-name="Cultural Guide">
+          <img class="preset-avatar-img" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&q=80" alt="Cultural Guide">
+          <span class="preset-avatar-name">Cultural Guide</span>
+          <span class="preset-avatar-tag">Storyteller</span>
+        </div>
+
+        <div class="preset-avatar-card" data-avatar="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=200&q=80" data-name="Wildlife Naturalist">
+          <img class="preset-avatar-img" src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=200&q=80" alt="Wildlife Naturalist">
+          <span class="preset-avatar-name">Wildlife Naturalist</span>
+          <span class="preset-avatar-tag">Biosphere</span>
+        </div>
+
+        <div class="preset-avatar-card" data-avatar="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80" data-name="River Explorer">
+          <img class="preset-avatar-img" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80" alt="River Explorer">
+          <span class="preset-avatar-name">River Explorer</span>
+          <span class="preset-avatar-tag">Kayaker</span>
+        </div>
+
+        <div class="preset-avatar-card" data-avatar="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80" data-name="Himalayan Yogi">
+          <img class="preset-avatar-img" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80" alt="Himalayan Yogi">
+          <span class="preset-avatar-name">Himalayan Yogi</span>
+          <span class="preset-avatar-tag">Wellness</span>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 0.8rem;">
+        <button class="filter-chip-btn" id="btn-cancel-avatar-picker" style="padding: 0.85rem 1.2rem;" type="button">
+          Cancel
+        </button>
+        <button class="btn-emerald-action" id="btn-save-avatar-choice" style="flex: 1; justify-content: center; padding: 0.85rem;" type="button">
+          ✓ Save Avatar & Sync Navbar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       GLOBAL MODAL: DANGER ZONE - ACCOUNT DELETION CONFIRMATION
+  ======================================================== -->
+  <div class="modal-overlay" id="modal-delete-account">
+    <div class="modal-content-box" style="max-width: 520px; border-color: rgba(239, 68, 68, 0.5);" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+      <button class="modal-close-x" id="modal-delete-close" aria-label="Close modal">×</button>
+
+      <div style="width: 64px; height: 64px; margin: 0 auto 1.2rem auto; border-radius: var(--radius-full); background: rgba(185, 28, 28, 0.18); border: 2px solid #B91C1C; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+        ⚠️
+      </div>
+
+      <h3 id="delete-modal-title" style="font-size: 1.45rem; font-weight: 800; color: #FCA5A5; text-align: center; margin-bottom: 0.6rem;">
+        Delete SafarSetu Account?
+      </h3>
+
+      <div style="background: rgba(185, 28, 28, 0.1); border: 1px solid rgba(185, 28, 28, 0.3); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.4rem; font-size: 0.88rem; line-height: 1.5; color: #FEE2E2;">
+        <strong>Warning:</strong> Are you sure you want to delete your SafarSetu account? All active bookings, saved itineraries, and Eco-Tokens will be permanently erased. This action cannot be reversed.
+      </div>
+
+      <div style="display: flex; gap: 0.8rem;">
+        <button class="filter-chip-btn" id="btn-cancel-delete-account" style="flex: 1; justify-content: center; padding: 0.85rem;" type="button">
+          Cancel, Keep Account
+        </button>
+        <button class="btn-danger-wipe" id="btn-confirm-delete-account" style="flex: 1; justify-content: center; padding: 0.85rem;" type="button">
+          🗑️ Yes, Wipe & Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ========================================================
+       GLOBAL MODAL 2: GI TAG QR AUTHENTICITY CERTIFICATE MODAL
+  ======================================================== -->
+  <div class="modal-overlay" id="modal-gi-verify">
+    <div class="modal-content-box" style="text-align: center;" role="dialog" aria-modal="true" aria-labelledby="gi-modal-title">
+      <button class="modal-close-x" id="modal-gi-close" aria-label="Close modal">×</button>
+
+      <div style="width: 70px; height: 70px; margin: 0 auto 1rem auto; background: var(--sage-subtle); border: 2px solid var(--sage); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+        🛡️
+      </div>
+
+      <span class="hero-pill-tag" style="background: var(--sage-subtle); color: var(--sage); border-color: var(--sage);">
+        AUTHENTICATED GEOGRAPHICAL INDICATION
+      </span>
+
+      <h3 id="gi-modal-title" style="font-size: 1.5rem; font-weight: 800; margin: 0.6rem 0 0.3rem 0;">
+        Kullu Pure Pashmina Shawl
+      </h3>
+      <p style="font-size: 0.85rem; color: var(--text-secondary);" id="gi-modal-number">
+        GI Tag #46 • Geographical Indications Registry, Govt of India
+      </p>
+
+      <!-- QR Code Visual -->
+      <div style="background: #ffffff; padding: 1.2rem; border-radius: var(--radius-lg); width: 190px; margin: 1.4rem auto; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=GI-IN-46-KULLU-SHAWL-VERIFIED-AUTH-09873" alt="GI Tag QR Code" style="width: 100%; height: 100%; display: block;" id="gi-modal-qr-img">
+      </div>
+
+      <div style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1rem; text-align: left; font-size: 0.85rem; line-height: 1.5; margin-bottom: 1.5rem;">
+        <div style="margin-bottom: 0.4rem;"><strong>Artisan Cooperative:</strong> <span id="gi-modal-artisan">Smt. Kamala Devi & Bhutti Weavers</span></div>
+        <div style="margin-bottom: 0.4rem;"><strong>Batch Registration:</strong> <span id="gi-modal-batch" style="font-family: var(--font-mono); color: var(--sage);">KL-2026-B88</span></div>
+        <div><strong>Provenance Certification:</strong> <span id="gi-modal-proof" style="color: var(--text-secondary);">Certified hand-spun local Angora and Merino wool, woven on traditional frame pit-looms.</span></div>
+      </div>
+
+      <button class="btn-emerald-action" id="gi-modal-done-btn" style="width: 100%; justify-content: center;">
+        ✓ Authenticity Verified
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       GLOBAL MODAL 3: EMERGENCY DISASTER SOS & EVACUATION MODAL
+  ======================================================== -->
+  <div class="modal-overlay" id="modal-emergency-sos">
+    <div class="modal-content-box" role="dialog" aria-modal="true" aria-labelledby="sos-modal-title">
+      <button class="modal-close-x" id="modal-sos-close" aria-label="Close modal">×</button>
+
+      <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1rem;">
+        <span style="font-size: 2.2rem;">🚨</span>
+        <div>
+          <h3 id="sos-modal-title" style="font-size: 1.4rem; font-weight: 800; color: #FCA5A5;">
+            National Disaster Response & SOS Dispatch
+          </h3>
+          <p style="font-size: 0.82rem; color: var(--text-secondary);">
+            Integrated Mountain Safety Protocol & Disaster Helpline
+          </p>
+        </div>
+      </div>
+
+      <div style="background: rgba(185, 28, 28, 0.15); border: 1px solid #B91C1C; border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.2rem; font-size: 0.88rem; color: #FEE2E2;">
+        <strong>Live Mountain Status:</strong> Landslide clearance teams deployed along Rohtang NH-3 pass. Do NOT attempt night transit.
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem;">
+        <div style="background: var(--bg-secondary); padding: 0.85rem 1rem; border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-weight: 700; font-size: 0.9rem;">National Disaster Management (NDMA)</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted);">24/7 Toll-Free Mountain Rescue Helpline</div>
+          </div>
+          <a href="tel:1078" style="background: #B91C1C; color: #fff; padding: 0.4rem 0.9rem; border-radius: var(--radius-full); font-weight: 800; font-size: 0.85rem;">📞 Call 1078</a>
+        </div>
+        <div style="background: var(--bg-secondary); padding: 0.85rem 1rem; border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-weight: 700; font-size: 0.9rem;">State Emergency Operations Centre</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted);">Himachal / Uttarakhand Disaster Desk</div>
+          </div>
+          <a href="tel:1070" style="background: rgba(255,255,255,0.1); color: #fff; padding: 0.4rem 0.9rem; border-radius: var(--radius-full); font-weight: 800; font-size: 0.85rem;">📞 Call 1070</a>
+        </div>
+      </div>
+
+      <button class="btn-primary-action" id="btn-broadcast-gps-sos" style="width: 100%; justify-content: center;">
+        📍 Broadcast My GPS Coordinates to Rescue Command
+      </button>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Application Scripts -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

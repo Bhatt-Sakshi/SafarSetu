@@ -1,0 +1,590 @@
+{
+  "user": {
+    "id": "usr-safarsetu",
+    "name": "Aarav Sharma",
+    "email": "aarav.sharma@safarsetu.in",
+    "role": "tourist",
+    "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80",
+    "isPro": false,
+    "proPlanExpires": null,
+    "wallet": {
+      "ecoTokens": 100,
+      "totalTokensEarned": 1240,
+      "totalTokensRedeemed": 740,
+      "carbonSavedKg": 0,
+      "offbeatVisited": 8,
+      "sustainabilityTier": "Gold Eco-Explorer"
+    },
+    "activeBookings": [],
+    "savedItineraries": []
+  },
+  "destinations": {
+    "manali": {
+      "name": "Manali",
+      "region": "Himachal Pradesh, India",
+      "lat": 32.2396,
+      "lng": 77.1887,
+      "altitude": "2,050m",
+      "terrain": "mountain",
+      "isMountain": true,
+      "landslideRisk": "extreme",
+      "weather": {
+        "temp": "14°C",
+        "condition": "Heavy Rain & Mountain Mist",
+        "rainProb": 88,
+        "wind": "28 km/h",
+        "aqi": 22,
+        "advisory": "Monsoon active across Beas basin. Landslide danger high along Solang-Rohtang axis."
+      },
+      "crowdScore": 92,
+      "baseBudget": 2800,
+      "attractions": [
+        {
+          "name": "Hadimba Devi Ancient Forest Temple",
+          "lat": 32.2483,
+          "lng": 77.1706,
+          "type": "Heritage",
+          "crowd": "High (89%)"
+        },
+        {
+          "name": "Jogini Waterfall Sacred Trail",
+          "lat": 32.2694,
+          "lng": 77.1951,
+          "type": "Eco-Trail",
+          "crowd": "Moderate (55%)"
+        },
+        {
+          "name": "Old Manali Cider & Woodcraft Lane",
+          "lat": 32.253,
+          "lng": 77.175,
+          "type": "Cultural",
+          "crowd": "High (78%)"
+        },
+        {
+          "name": "Rohtang Mountain Pass (High Hazard Zone)",
+          "lat": 32.3716,
+          "lng": 77.2466,
+          "type": "Alpine Pass",
+          "crowd": "Critical (96%)"
+        }
+      ],
+      "hazardAlert": {
+        "active": true,
+        "severity": "critical",
+        "title": "🚨 HIGH LANDSLIDE RISK ALERT: Heavy rainfall detected along mountain passes. High risk of rockfalls and road closures.",
+        "subtitle": "🚧 Disaster Authority Advisory: Travel restricted during night hours.",
+        "impactedRoutes": [
+          "Rohtang Pass NH-3",
+          "Solang Valley Ridge Road",
+          "Marhi Descent"
+        ],
+        "safeReroute": {
+          "id": "reroute-manali-sethan",
+          "name": "Valley Safe Alternative: Sethan Buddhist Sanctuary & Naggar Heritage Trail",
+          "description": "Avoid high-altitude active slip zones. Switch to stable mid-altitude pine forests of Sethan, visit the 500-year-old Naggar Castle and local Kullu shawl weavers cooperative.",
+          "rewardTokens": 100,
+          "riskLevel": "safe",
+          "terrainBadge": "🟢 Safe Valley Route",
+          "carbonSaving": "18.4 kg CO2"
+        }
+      },
+      "hiddenGem": {
+        "name": "Sethan Igloo & Buddhist Sanctuary Valley",
+        "description": "A tranquil Buddhist village nestled 12km from Manali at 2,600m. 95% less crowded than Rohtang with zero commercial plastic waste.",
+        "bonusTokens": 80
+      }
+    },
+    "shimla": {
+      "name": "Shimla",
+      "region": "Himachal Pradesh, India",
+      "lat": 31.1048,
+      "lng": 77.1734,
+      "altitude": "2,276m",
+      "terrain": "mountain",
+      "isMountain": true,
+      "landslideRisk": "extreme",
+      "weather": {
+        "temp": "16°C",
+        "condition": "Torrential Downpour & Fog",
+        "rainProb": 82,
+        "wind": "22 km/h",
+        "aqi": 28,
+        "advisory": "Kalka-Shimla highway prone to debris flows. Landslide alert active along bypass roads."
+      },
+      "crowdScore": 88,
+      "baseBudget": 3200,
+      "attractions": [
+        {
+          "name": "The Ridge & Christ Church",
+          "lat": 31.1051,
+          "lng": 77.174,
+          "type": "Heritage",
+          "crowd": "High (91%)"
+        },
+        {
+          "name": "Jakhoo Hill Hanuman Sanctuary",
+          "lat": 31.101,
+          "lng": 77.185,
+          "type": "Spiritual",
+          "crowd": "High (82%)"
+        },
+        {
+          "name": "Viceregal Lodge Botanical Grounds",
+          "lat": 31.103,
+          "lng": 77.14,
+          "type": "Colonial Heritage",
+          "crowd": "Moderate (60%)"
+        }
+      ],
+      "hazardAlert": {
+        "active": true,
+        "severity": "critical",
+        "title": "🚨 HIGH LANDSLIDE RISK ALERT: Heavy rainfall detected along mountain passes. High risk of rockfalls and road closures.",
+        "subtitle": "🚧 Disaster Authority Advisory: Travel restricted during night hours.",
+        "impactedRoutes": [
+          "NH-5 Kalka-Shimla Corridor",
+          "Dhalli Tunnel Bypass",
+          "Tara Devi Slopes"
+        ],
+        "safeReroute": {
+          "id": "reroute-shimla-mashobra",
+          "name": "Valley Safe Alternative: Mashobra Apple Valley & Craignano Pine Reserve",
+          "description": "Bypass vulnerable highway cuttings. Explore stable forested trails of Craignano, enjoy farm-to-table organic apple preserves, and learn Pahari wooden temple architecture.",
+          "rewardTokens": 100,
+          "riskLevel": "safe",
+          "terrainBadge": "🟢 Safe Valley Route",
+          "carbonSaving": "15.2 kg CO2"
+        }
+      },
+      "hiddenGem": {
+        "name": "Craignano Nature Sanctuary & Mashobra Orchards",
+        "description": "Untouched deodar canopy planted in 1890, offering tranquil walking trails with zero road vehicular noise.",
+        "bonusTokens": 75
+      }
+    },
+    "leh": {
+      "name": "Leh & Ladakh",
+      "region": "Ladakh UT, India",
+      "lat": 34.1526,
+      "lng": 77.5771,
+      "altitude": "3,500m",
+      "terrain": "mountain",
+      "isMountain": true,
+      "landslideRisk": "extreme",
+      "weather": {
+        "temp": "8°C",
+        "condition": "Sudden Cloudburst & Scree Slides",
+        "rainProb": 65,
+        "wind": "34 km/h",
+        "aqi": 14,
+        "advisory": "Flash flood watch along Indus tributaries. Khardung La & Chang La passes experiencing scree slides."
+      },
+      "crowdScore": 76,
+      "baseBudget": 4200,
+      "attractions": [
+        {
+          "name": "Leh Palace & Old Royal Quarter",
+          "lat": 34.1642,
+          "lng": 77.585,
+          "type": "Heritage",
+          "crowd": "Moderate (68%)"
+        },
+        {
+          "name": "Thiksey Monastery Solar Chorten",
+          "lat": 34.056,
+          "lng": 77.6667,
+          "type": "Monastic",
+          "crowd": "Moderate (54%)"
+        },
+        {
+          "name": "Khardung La Pass (High Hazard Zone)",
+          "lat": 34.2789,
+          "lng": 77.6044,
+          "type": "Pass",
+          "crowd": "High (89%)"
+        }
+      ],
+      "hazardAlert": {
+        "active": true,
+        "severity": "critical",
+        "title": "🚨 HIGH LANDSLIDE RISK ALERT: Heavy rainfall detected along mountain passes. High risk of rockfalls and road closures.",
+        "subtitle": "🚧 Disaster Authority Advisory: Travel restricted during night hours.",
+        "impactedRoutes": [
+          "Khardung La Northern Ascent",
+          "Chang La Pass Highway",
+          "Zanskar Gorge Cutting"
+        ],
+        "safeReroute": {
+          "id": "reroute-leh-indus",
+          "name": "Valley Safe Alternative: Indus River Valley Apricot Groves & Alchi Heritage Loop",
+          "description": "Avoid freezing 18,000-ft passes with rockfall warnings. Travel the broad, stable Indus river basin, discover 11th-century Alchi wall murals, and support solar-powered Changpa wool cooperatives.",
+          "rewardTokens": 100,
+          "riskLevel": "safe",
+          "terrainBadge": "🟢 Safe Valley Route",
+          "carbonSaving": "22.0 kg CO2"
+        }
+      },
+      "hiddenGem": {
+        "name": "Turtuk Silk Route Village & Organic Apricot Cooperative",
+        "description": "Balti cultural sanctuary reopened to mindful visitors; 100% solar microgrid powered with ancient irrigation channels.",
+        "bonusTokens": 90
+      }
+    },
+    "munnar": {
+      "name": "Munnar",
+      "region": "Kerala, India",
+      "lat": 10.0889,
+      "lng": 77.0595,
+      "altitude": "1,600m",
+      "terrain": "mountain",
+      "isMountain": true,
+      "landslideRisk": "extreme",
+      "weather": {
+        "temp": "17°C",
+        "condition": "Southwest Monsoon Storms",
+        "rainProb": 92,
+        "wind": "26 km/h",
+        "aqi": 18,
+        "advisory": "Soil saturation in Western Ghats exceeds threshold. Gap Road & Devikulam ghats under red alert."
+      },
+      "crowdScore": 84,
+      "baseBudget": 2900,
+      "attractions": [
+        {
+          "name": "Tea Museum & Organic Estates",
+          "lat": 10.089,
+          "lng": 77.06,
+          "type": "Agro-Heritage",
+          "crowd": "High (86%)"
+        },
+        {
+          "name": "Eravikulam Nilgiri Tahr Sanctuary",
+          "lat": 10.15,
+          "lng": 77.0667,
+          "type": "Wildlife",
+          "crowd": "High (90%)"
+        },
+        {
+          "name": "Top Station Ridge (Hazard Cutting)",
+          "lat": 10.125,
+          "lng": 77.24,
+          "type": "Viewpoint",
+          "crowd": "High (80%)"
+        }
+      ],
+      "hazardAlert": {
+        "active": true,
+        "severity": "critical",
+        "title": "🚨 HIGH LANDSLIDE RISK ALERT: Heavy rainfall detected along mountain passes. High risk of rockfalls and road closures.",
+        "subtitle": "🚧 Disaster Authority Advisory: Travel restricted during night hours.",
+        "impactedRoutes": [
+          "Munnar-Gap Road NH-85",
+          "Mattupetty Dam Descent",
+          "Devikulam Cutting"
+        ],
+        "safeReroute": {
+          "id": "reroute-munnar-marayoor",
+          "name": "Valley Safe Alternative: Marayoor Sandalwood Forest & Megalithic Dolmens Valley",
+          "description": "Descend safely into the rain-shadow eastern slopes of Marayoor. Discover natural sandalwood forests, prehistoric Neolithic dolmens, and traditional organic jaggery making.",
+          "rewardTokens": 100,
+          "riskLevel": "safe",
+          "terrainBadge": "🟢 Safe Valley Route",
+          "carbonSaving": "16.8 kg CO2"
+        }
+      },
+      "hiddenGem": {
+        "name": "Marayoor Organic Sugarcane & Sandalwood Bio-Reserve",
+        "description": "Rain-shadow plateau with ancient stone-age dolmens and artisan GI-tagged Marayoor Jaggery boil houses.",
+        "bonusTokens": 85
+      }
+    },
+    "gangtok": {
+      "name": "Gangtok",
+      "region": "Sikkim, India",
+      "lat": 27.3314,
+      "lng": 88.6138,
+      "altitude": "1,650m",
+      "terrain": "mountain",
+      "isMountain": true,
+      "landslideRisk": "extreme",
+      "weather": {
+        "temp": "15°C",
+        "condition": "Continuous Heavy Showers",
+        "rainProb": 86,
+        "wind": "20 km/h",
+        "aqi": 16,
+        "advisory": "Teesta basin soil slippage. Permits to Nathu La suspended due to mudslides at 13th Mile."
+      },
+      "crowdScore": 79,
+      "baseBudget": 3100,
+      "attractions": [
+        {
+          "name": "MG Marg Solar Pedestrian Promenade",
+          "lat": 27.329,
+          "lng": 88.612,
+          "type": "Pedestrian Eco-Zone",
+          "crowd": "High (84%)"
+        },
+        {
+          "name": "Rumtek Royal Monastery",
+          "lat": 27.3,
+          "lng": 88.55,
+          "type": "Spiritual",
+          "crowd": "Moderate (58%)"
+        },
+        {
+          "name": "Nathu La Pass (Suspended - Hazard)",
+          "lat": 27.386,
+          "lng": 88.831,
+          "type": "Border Pass",
+          "crowd": "Closed (98%)"
+        }
+      ],
+      "hazardAlert": {
+        "active": true,
+        "severity": "critical",
+        "title": "🚨 HIGH LANDSLIDE RISK ALERT: Heavy rainfall detected along mountain passes. High risk of rockfalls and road closures.",
+        "subtitle": "🚧 Disaster Authority Advisory: Travel restricted during night hours.",
+        "impactedRoutes": [
+          "Jawaharlal Nehru Road (Nathu La)",
+          "Singtam-Dikchu Highway",
+          "Mangan North Axis"
+        ],
+        "safeReroute": {
+          "id": "reroute-gangtok-rumtek",
+          "name": "Valley Safe Alternative: Rumtek Monastery Heritage & Organic Farmstay Loop",
+          "description": "Avoid fragile high border roads. Tour the ancient Rumtek Kagyu Monastery, visit 100% organic cardamom farms, and partake in Lepcha bamboo weaving workshops.",
+          "rewardTokens": 100,
+          "riskLevel": "safe",
+          "terrainBadge": "🟢 Safe Valley Route",
+          "carbonSaving": "17.5 kg CO2"
+        }
+      },
+      "hiddenGem": {
+        "name": "Rey Mindu Traditional Lepcha Village",
+        "description": "Terraced organic farming village preserving traditional handloom nettle fabric and heirloom black rice.",
+        "bonusTokens": 80
+      }
+    },
+    "goa": {
+      "name": "Goa",
+      "region": "Goa, India",
+      "lat": 15.2993,
+      "lng": 74.124,
+      "altitude": "10m",
+      "terrain": "coastal",
+      "isMountain": false,
+      "landslideRisk": "safe",
+      "weather": {
+        "temp": "29°C",
+        "condition": "Sunny Coastal Breeze",
+        "rainProb": 24,
+        "wind": "14 km/h",
+        "aqi": 35,
+        "advisory": "Pleasant coastal conditions. High UV during midday; sea swimming flag green."
+      },
+      "crowdScore": 85,
+      "baseBudget": 3500,
+      "attractions": [
+        {
+          "name": "Fontainhas Latin Heritage Quarter",
+          "lat": 15.4989,
+          "lng": 73.8311,
+          "type": "Heritage",
+          "crowd": "Moderate (65%)"
+        },
+        {
+          "name": "Chorão Island Bird Sanctuary",
+          "lat": 15.525,
+          "lng": 73.865,
+          "type": "Eco-Mangrove",
+          "crowd": "Low (30%)"
+        },
+        {
+          "name": "Cabo de Rama Fort Lookout",
+          "lat": 15.088,
+          "lng": 73.918,
+          "type": "Coastal Fort",
+          "crowd": "Moderate (50%)"
+        },
+        {
+          "name": "Baga & Calangute Beach (Heavy Crowds)",
+          "lat": 15.555,
+          "lng": 73.751,
+          "type": "Commercial Beach",
+          "crowd": "High (94%)"
+        }
+      ],
+      "hazardAlert": null,
+      "hiddenGem": {
+        "name": "Divar Island Eco-Cycle & Backwater Sanctuary",
+        "description": "Car-free scenic island connected only by solar ferry, lined with vintage Portuguese villas and paddy fields.",
+        "bonusTokens": 75
+      }
+    },
+    "varanasi": {
+      "name": "Varanasi",
+      "region": "Uttar Pradesh, India",
+      "lat": 25.3176,
+      "lng": 82.9739,
+      "altitude": "80m",
+      "terrain": "cultural",
+      "isMountain": false,
+      "landslideRisk": "safe",
+      "weather": {
+        "temp": "31°C",
+        "condition": "Clear & Golden Sunlight",
+        "rainProb": 15,
+        "wind": "10 km/h",
+        "aqi": 68,
+        "advisory": "Ideal conditions for solar boat rides and morning heritage walking tours along the ghats."
+      },
+      "crowdScore": 91,
+      "baseBudget": 2200,
+      "attractions": [
+        {
+          "name": "Dashashwamedh Ghat Ganga Aarti",
+          "lat": 25.3075,
+          "lng": 83.0104,
+          "type": "Spiritual",
+          "crowd": "Critical (97%)"
+        },
+        {
+          "name": "Assi Ghat Morning Yoga & Solar Boating",
+          "lat": 25.289,
+          "lng": 83.006,
+          "type": "Eco-Spiritual",
+          "crowd": "Moderate (62%)"
+        },
+        {
+          "name": "Sarnath Deer Park & Ashokan Pillar",
+          "lat": 25.3811,
+          "lng": 83.0214,
+          "type": "Archaeological",
+          "crowd": "Moderate (55%)"
+        },
+        {
+          "name": "Varanasi Zari Silk Weaver Colonies",
+          "lat": 25.32,
+          "lng": 82.99,
+          "type": "GI Artisan Hub",
+          "crowd": "Low (40%)"
+        }
+      ],
+      "hazardAlert": null,
+      "hiddenGem": {
+        "name": "Chunar Sandstone Citadel & Rural Clay Potter Hub",
+        "description": "Historic Ganga cliff fortress 35km south; home to GI-tagged pink sandstone carvers and red glazed clay artisans.",
+        "bonusTokens": 85
+      }
+    },
+    "paris": {
+      "name": "Paris",
+      "region": "Île-de-France, France",
+      "lat": 48.8566,
+      "lng": 2.3522,
+      "altitude": "35m",
+      "terrain": "cultural",
+      "isMountain": false,
+      "landslideRisk": "safe",
+      "weather": {
+        "temp": "19°C",
+        "condition": "Partly Cloudy & Mild",
+        "rainProb": 20,
+        "wind": "12 km/h",
+        "aqi": 32,
+        "advisory": "Great weather for cycling along the Seine eco-paths and visiting open-air markets."
+      },
+      "crowdScore": 94,
+      "baseBudget": 8500,
+      "attractions": [
+        {
+          "name": "Eiffel Tower & Champ de Mars",
+          "lat": 48.8584,
+          "lng": 2.2945,
+          "type": "Iconic",
+          "crowd": "Critical (98%)"
+        },
+        {
+          "name": "Louvre Museum & Tuileries Garden",
+          "lat": 48.8606,
+          "lng": 2.3376,
+          "type": "Art & Culture",
+          "crowd": "Critical (95%)"
+        },
+        {
+          "name": "Canal Saint-Martin Solar Boat Way",
+          "lat": 48.871,
+          "lng": 2.366,
+          "type": "Eco-District",
+          "crowd": "Moderate (58%)"
+        },
+        {
+          "name": "Promenade Plantée Green Viaduct",
+          "lat": 48.848,
+          "lng": 2.38,
+          "type": "Linear Park",
+          "crowd": "Low (35%)"
+        }
+      ],
+      "hazardAlert": null,
+      "hiddenGem": {
+        "name": "Promenade Plantée & Viaduc des Arts",
+        "description": "Elevated park built on a 19th-century railway viaduct, housing 50+ artisan ateliers, glassblowers, and lute-makers.",
+        "bonusTokens": 80
+      }
+    },
+    "kyoto": {
+      "name": "Kyoto",
+      "region": "Kansai, Japan",
+      "lat": 35.0116,
+      "lng": 135.7681,
+      "altitude": "50m",
+      "terrain": "cultural",
+      "isMountain": false,
+      "landslideRisk": "safe",
+      "weather": {
+        "temp": "21°C",
+        "condition": "Pleasant Autumn Breeze",
+        "rainProb": 18,
+        "wind": "8 km/h",
+        "aqi": 19,
+        "advisory": "Optimal walking weather. Cherry and maple preservation zones operating with eco-shuttles."
+      },
+      "crowdScore": 89,
+      "baseBudget": 7800,
+      "attractions": [
+        {
+          "name": "Fushimi Inari Taisha Shrine",
+          "lat": 34.9671,
+          "lng": 135.7727,
+          "type": "Shinto Heritage",
+          "crowd": "Critical (95%)"
+        },
+        {
+          "name": "Arashiyama Bamboo Grove",
+          "lat": 35.017,
+          "lng": 135.671,
+          "type": "Nature",
+          "crowd": "High (92%)"
+        },
+        {
+          "name": "Philosopher's Path Canal Walk",
+          "lat": 35.027,
+          "lng": 135.795,
+          "type": "Eco-Walkway",
+          "crowd": "Moderate (55%)"
+        }
+      ],
+      "hazardAlert": null,
+      "hiddenGem": {
+        "name": "Ohara Rural Bamboo & Zen Garden Village",
+        "description": "Nestled in the northern hills with 80% fewer tourists; renowned for organic yuzu cultivation and indigo dyeing workshops.",
+        "bonusTokens": 90
+      }
+    }
+  },
+  "bookings": [],
+  "customItineraries": [],
+  "rerouteEvents": []
+}

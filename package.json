@@ -1,0 +1,29 @@
+{
+  "name": "safarsetu",
+  "version": "1.0.0",
+  "description": "SafarSetu — Discover the Soul of India. Modern Indian Travel & Tourism Booking Portal with Smart Trip Planning, Mountain Safety Intelligence, Dynamic Stays, and Local Artisan Marketplace.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^13.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^18.0.4",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.3",
+    "razorpay": "^2.9.8"
+  },
+  "keywords": [
+    "safarsetu",
+    "incredible-india",
+    "sustainable-travel",
+    "vande-bharat",
+    "homestays",
+    "trip-planner"
+  ],
+  "author": "SafarSetu Team",
+  "license": "MIT"
+}

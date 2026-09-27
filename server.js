@@ -709,6 +709,112 @@ function verifyRazorpaySignatureHandler(req, res) {
 app.post('/api/payments/verify-signature', optionalAuth, verifyRazorpaySignatureHandler);
 app.post('/api/payments/verify', optionalAuth, verifyRazorpaySignatureHandler);
 
+// Endpoint POST /api/payments/process-checkout - Direct, reliable checkout processing
+app.post('/api/payments/process-checkout', optionalAuth, (req, res) => {
+  try {
+    const {
+      amount,
+      itemTitle,
+      method = 'UPI & QR Code',
+      tokensEarned,
+      itemType = 'stay',
+      destination = 'Manali',
+      dateRange = 'Flexible',
+      guests = 1,
+      tokensUsed = 0,
+      discountSaved = 0
+    } = req.body;
+
+    const user = req.user || db.prepare('SELECT * FROM users WHERE id = ?').get('demo_user_aarav') || db.prepare('SELECT * FROM users LIMIT 1').get();
+
+    const title = itemTitle || 'Sustainable Travel Reservation';
+    const finalAmount = parseFloat(amount) || 3308;
+    const tUsed = parseInt(tokensUsed) || 0;
+
+    // Calculate tokens awarded if not specified
+    const isPro = Boolean(user && user.is_pro) || itemType === 'pro';
+    const multiplier = isPro ? 2 : 1;
+    let rewardTokens = parseInt(tokensEarned);
+    if (isNaN(rewardTokens) || rewardTokens <= 0) {
+      let baseReward = 50;
+      if (itemType === 'transit') baseReward = 85;
+      if (itemType === 'stay') baseReward = 120;
+      if (itemType === 'market') baseReward = 60;
+      if (itemType === 'pro') baseReward = 100;
+      rewardTokens = baseReward * multiplier;
+    }
+
+    const bookingId = Date.now();
+    const newTxnId = `TXN_SETU_${Date.now().toString(36).toUpperCase()}`;
+
+    // Insert reservation record into SQLite bookings table
+    db.prepare(`
+      INSERT INTO bookings (
+        id, user_id, category, item_name, amount_paid,
+        eco_tokens_awarded, tokens_used, status, payment_id,
+        destination, date_range, guests, meta_json
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      newTxnId,
+      user ? user.id : 'demo_user_aarav',
+      itemType,
+      title,
+      finalAmount,
+      rewardTokens,
+      tUsed,
+      'confirmed',
+      newTxnId,
+      destination,
+      dateRange,
+      parseInt(guests) || 1,
+      JSON.stringify({ method, bookingId, timestamp: new Date().toISOString() })
+    );
+
+    // Increment user's eco_tokens in users table
+    if (user) {
+      const newTokens = Math.max(0, (user.eco_tokens || 500) - tUsed + rewardTokens);
+      const newCarbon = parseFloat(((user.carbon_saved_kg || 157.0) + (itemType === 'pro' ? 25.0 : 14.5)).toFixed(1));
+      const newPro = itemType === 'pro' ? 1 : user.is_pro;
+
+      db.prepare(`
+        UPDATE users
+        SET eco_tokens = ?, carbon_saved_kg = ?, is_pro = ?
+        WHERE id = ?
+      `).run(newTokens, newCarbon, newPro, user.id);
+
+      user.eco_tokens = newTokens;
+      user.carbon_saved_kg = newCarbon;
+      user.is_pro = newPro;
+    }
+
+    const created = db.prepare('SELECT * FROM bookings WHERE id = ?').get(newTxnId);
+    const formatted = formatBookingRecord(created);
+
+    return res.json({
+      success: true,
+      bookingId: bookingId,
+      transactionId: newTxnId,
+      amount: finalAmount,
+      tokensEarned: rewardTokens,
+      paymentMethod: method,
+      itemTitle: title,
+      data: {
+        bookingId: bookingId,
+        transactionId: newTxnId,
+        booking: formatted,
+        updatedWallet: {
+          ecoTokens: user ? user.eco_tokens : 500,
+          carbonSavedKg: user ? user.carbon_saved_kg : 157.0,
+          isPro: user ? Boolean(user.is_pro) : false
+        }
+      }
+    });
+  } catch (err) {
+    console.error('Process checkout error in SQLite:', err);
+    return res.status(500).json({ success: false, message: 'Server error processing checkout.' });
+  }
+});
+
 
 
 // Standard Bookings Endpoint (Backward compatibility & direct testing)

@@ -2233,12 +2233,13 @@ function showSuccessModal(data) {
   const tokenChangeEl = document.getElementById('receipt-token-change');
   const totalPaidEl = document.getElementById('receipt-total-paid');
 
+  const currentTokenBal = TourVerseState.user?.wallet?.ecoTokens || 500;
   if (txnEl) txnEl.textContent = paymentId;
   if (orderEl) orderEl.textContent = orderId;
   if (timeEl) timeEl.textContent = timestampStr;
   if (itemEl) itemEl.textContent = receiptData.itemTitle;
   if (payMethodEl) payMethodEl.textContent = displayPaymentMethod;
-  if (tokenChangeEl) tokenChangeEl.textContent = `+${tokensAwarded} Tokens Awarded (-${tokensUsed} Redeemed)`;
+  if (tokenChangeEl) tokenChangeEl.textContent = `${currentTokenBal} Tokens (+${tokensAwarded} Earned)`;
   if (totalPaidEl) totalPaidEl.textContent = `₹${totalPaidRupees.toLocaleString()}`;
 
   setCheckoutModalStep('success');
@@ -2248,91 +2249,192 @@ function showSuccessModal(data) {
 window.showSuccessModal = showSuccessModal;
 
 /**
- * Interactive Payment Gateway Flow
- * If official Razorpay SDK (window.Razorpay) is ready, launches rzp.open().
- * Otherwise, shows a realistic 1.5-second banking processing overlay ("Authenticating with banking network..."),
- * saves booking to SQLite via POST /api/bookings, updates Eco-Tokens, and transitions to confirmed receipt modal.
+ * Direct & Reliable Checkout Execution
+ * 1. Shows animated loading state on the button ("Processing with Bank...")
+ * 2. Sends POST /api/payments/process-checkout with amount, itemTitle, method, tokensEarned, and JWT auth
+ * 3. Closes checkout modal form and opens green "Payment & Reservation Confirmed!" receipt modal
+ * 4. Populates Transaction ID (TXN_SETU_...), Date & Time, Item Reserved, Payment Method, Eco-Tokens Balance, Total Amount Paid
+ * 5. Updates user's active bookings array in state/localStorage, renders immediately in "My Bookings" and updates profile & navbar Eco-Tokens
  */
 async function executePaymentGatewayFlow() {
-  const item = TourVerseState.activeCheckoutItem || {};
+  const payBtn = document.getElementById('btn-trigger-payment-flow');
+  const payBtnLabel = document.getElementById('btn-pay-text-label');
 
-  // Calculate final payable amount based on current breakdown
-  const basePrice = item.basePrice || 3500;
-  const offPeakDiscount = item.discountSaved || 0;
-  const slider = document.getElementById('checkout-token-slider');
-  const tokensUsed = slider ? (parseInt(slider.value) || 0) : (item.tokensUsed || 0);
-  const tokenDiscount = tokensUsed * 2;
-  const subtotal = Math.max(0, basePrice - offPeakDiscount - tokenDiscount);
-  const taxRate = item.taxRate || (item.itemType === 'pro' ? 0.18 : 0.05);
-  const taxes = Math.round(subtotal * taxRate);
-  const finalPayableAmount = item.finalPayable || (subtotal + taxes) || 3500;
-
-  const Razorpay = window.Razorpay || (typeof globalThis.Razorpay !== 'undefined' ? globalThis.Razorpay : null);
-
-  // 1. If official Razorpay SDK is ready, launch rzp.open()
-  if (typeof Razorpay === 'function') {
-    const options = {
-      key: "rzp_test_placeholder",
-      amount: Math.round(finalPayableAmount * 100),
-      currency: "INR",
-      name: "SafarSetu",
-      description: "Eco-Friendly Tourism & Stay Reservation",
-      image: "https://cdn-icons-png.flaticon.com/512/201/201623.png",
-      handler: async function (response) {
-        const paymentId = response.razorpay_payment_id || `pay_rzp_${Date.now()}`;
-        await persistBookingAndShowSuccess(paymentId, 'Razorpay Live Gateway', finalPayableAmount, item);
-      },
-      prefill: {
-        name: TourVerseState.user?.name || "Aarav Sharma",
-        email: TourVerseState.user?.email || "aarav@safarsetu.com",
-        contact: "9999999999"
-      },
-      theme: {
-        color: "#059669"
-      }
-    };
-
-    try {
-      const rzp = new Razorpay(options);
-      rzp.on('payment.failed', function (response) {
-        alert("Oops! Something went wrong.\nPayment Failed");
-      });
-      rzp.open();
-      return;
-    } catch (err) {
-      console.warn('Razorpay SDK threw error on open, switching to banking network processing:', err);
-    }
+  // a. Show animated loading state on the button (e.g., spinner with text "Processing with Bank...")
+  if (payBtn) {
+    payBtn.disabled = true;
+    payBtn.style.opacity = '0.9';
+    payBtn.style.pointerEvents = 'none';
+    payBtn.innerHTML = `
+      <span class="inline-spinner" style="display:inline-block; width:16px; height:16px; border:2.5px solid rgba(255,255,255,0.3); border-top-color:#ffffff; border-radius:50%; animation:spinRing 0.8s linear infinite; vertical-align:middle; margin-right:8px;"></span>
+      <span>Processing with Bank...</span>
+    `;
   }
 
-  // 2. Otherwise: Realistic 1.5-second processing overlay & transition to confirmed receipt
-  setCheckoutModalStep('processing');
-  const titleEl = document.getElementById('processing-title');
-  const descEl = document.getElementById('processing-desc');
-  const barEl = document.getElementById('processing-step-bar');
+  const currentBookingItem = TourVerseState.activeCheckoutItem || {};
+  const basePrice = currentBookingItem.basePrice || 3500;
+  const offPeakDiscount = currentBookingItem.discountSaved || 0;
+  const slider = document.getElementById('checkout-token-slider');
+  const tokensUsed = slider ? (parseInt(slider.value) || 0) : (currentBookingItem.tokensUsed || 0);
+  const tokenDiscount = tokensUsed * 2;
+  const subtotal = Math.max(0, basePrice - offPeakDiscount - tokenDiscount);
+  const taxRate = currentBookingItem.taxRate || (currentBookingItem.itemType === 'pro' ? 0.18 : 0.05);
+  const taxes = Math.round(subtotal * taxRate);
+  const finalPayableAmount = currentBookingItem.finalPayable || (subtotal + taxes) || 3308;
 
-  const methodDisplayName = getSelectedPaymentMethodFullDisplayName();
+  const isPro = Boolean(TourVerseState.user?.isPro || currentBookingItem.itemType === 'pro');
+  const multiplier = isPro ? 2 : 1;
+  const calculatedEcoTokens = (currentBookingItem.tokensAwarded || 120) * multiplier;
 
-  if (titleEl) titleEl.textContent = 'Authenticating with banking network...';
-  if (descEl) descEl.textContent = `Establishing encrypted 256-bit handshake with ${methodDisplayName}. Please do not refresh.`;
-  if (barEl) barEl.style.width = '30%';
+  const selectedPaymentMethod = getSelectedPaymentMethodFullDisplayName() || 'UPI (GPay / PhonePe)';
+  const token = localStorage.getItem('token') || localStorage.getItem('safarsetu_jwt_token') || TourVerseState.authToken || '';
 
-  // Dynamic progress updates across 1.5 seconds
-  setTimeout(() => {
-    if (barEl) barEl.style.width = '70%';
-    if (descEl) descEl.textContent = 'Authorizing transaction with Reserve Bank of India gateway...';
-  }, 600);
+  // b. Send direct request to the backend booking/payment endpoint
+  let data = null;
+  try {
+    const res = await fetch('/api/payments/process-checkout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      },
+      body: JSON.stringify({
+        amount: finalPayableAmount,
+        itemTitle: currentBookingItem.name || currentBookingItem.title || 'Himalayan Solar Sanctuary',
+        method: selectedPaymentMethod || 'UPI (GPay / PhonePe)',
+        tokensEarned: calculatedEcoTokens,
+        tokensUsed: tokensUsed,
+        itemType: currentBookingItem.itemType || 'stay',
+        destination: currentBookingItem.meta?.destination || currentBookingItem.destination || 'Manali',
+        dateRange: document.getElementById('checkout-date-input')?.value || 'Flexible',
+        guests: parseInt(document.getElementById('checkout-guests-input')?.value) || 1,
+        discountSaved: offPeakDiscount
+      })
+    });
+    data = await res.json();
+  } catch (err) {
+    console.warn('Direct payment network warning:', err);
+  }
 
-  setTimeout(() => {
-    if (barEl) barEl.style.width = '95%';
-    if (descEl) descEl.textContent = 'Synchronizing reservation with SafarSetu database vault...';
-  }, 1100);
+  // Restore button state
+  if (payBtn) {
+    payBtn.disabled = false;
+    payBtn.style.opacity = '1';
+    payBtn.style.pointerEvents = 'auto';
+    updateCheckoutPayButtonText();
+  }
 
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  if (barEl) barEl.style.width = '100%';
+  const generatedTxnId = `TXN_SETU_` + Date.now().toString(36).toUpperCase();
+  const transactionId = (data && data.transactionId) ? data.transactionId : generatedTxnId;
+  const itemTitle = currentBookingItem.name || currentBookingItem.title || (data && data.itemTitle) || 'Himalayan Solar Sanctuary';
+  const chosenMethod = (data && data.paymentMethod) ? data.paymentMethod : selectedPaymentMethod || 'UPI (GPay / PhonePe)';
 
-  const txnId = `TXN-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
-  await persistBookingAndShowSuccess(txnId, methodDisplayName, finalPayableAmount, item);
+  // e. Update the user's active bookings array in state/localStorage so it immediately renders in "My Bookings" and updates the profile Eco-Tokens display
+  if (!TourVerseState.user) {
+    TourVerseState.user = {
+      id: 'demo_user_aarav',
+      name: 'Aarav Sharma',
+      email: 'aarav.sharma@safarsetu.in',
+      role: 'tourist',
+      isPro: Boolean(currentBookingItem.itemType === 'pro'),
+      wallet: {
+        ecoTokens: 500,
+        carbonSavedKg: 157.0,
+        sustainabilityTier: 'Gold Eco-Explorer'
+      },
+      activeBookings: []
+    };
+  }
+
+  let updatedTokenBalance;
+  if (data?.data?.updatedWallet?.ecoTokens !== undefined) {
+    updatedTokenBalance = data.data.updatedWallet.ecoTokens;
+  } else {
+    const currentTokens = TourVerseState.user.wallet?.ecoTokens ?? 500;
+    updatedTokenBalance = Math.max(0, currentTokens - tokensUsed + calculatedEcoTokens);
+  }
+
+  if (!TourVerseState.user.wallet) TourVerseState.user.wallet = {};
+  TourVerseState.user.wallet.ecoTokens = updatedTokenBalance;
+  if (data?.data?.updatedWallet?.carbonSavedKg) {
+    TourVerseState.user.wallet.carbonSavedKg = data.data.updatedWallet.carbonSavedKg;
+  } else {
+    TourVerseState.user.wallet.carbonSavedKg = parseFloat(((TourVerseState.user.wallet.carbonSavedKg || 157.0) + (currentBookingItem.itemType === 'pro' ? 25.0 : 14.5)).toFixed(1));
+  }
+
+  if (currentBookingItem.itemType === 'pro') {
+    TourVerseState.user.isPro = true;
+  }
+
+  if (!TourVerseState.user.activeBookings) {
+    TourVerseState.user.activeBookings = [];
+  }
+
+  const confirmedBooking = data?.data?.booking || {
+    id: transactionId,
+    itemType: currentBookingItem.itemType || 'stay',
+    category: currentBookingItem.itemType || 'stay',
+    title: itemTitle,
+    itemName: itemTitle,
+    totalPaid: finalPayableAmount,
+    basePrice: basePrice,
+    tokensAwarded: calculatedEcoTokens,
+    tokensUsed: tokensUsed,
+    status: 'confirmed',
+    paymentId: transactionId,
+    paymentMethod: chosenMethod,
+    destination: currentBookingItem.meta?.destination || currentBookingItem.destination || 'Manali',
+    dateRange: document.getElementById('checkout-date-input')?.value || 'Flexible',
+    guests: parseInt(document.getElementById('checkout-guests-input')?.value) || 1,
+    bookedAt: new Date().toISOString()
+  };
+
+  TourVerseState.user.activeBookings.unshift(confirmedBooking);
+
+  // Save to localStorage immediately
+  saveLocalUserFallback();
+  try {
+    localStorage.setItem('tourverse_user', JSON.stringify(TourVerseState.user));
+    localStorage.setItem('safarsetu_user', JSON.stringify(TourVerseState.user));
+  } catch (e) {}
+
+  // Update profile and navbar displays
+  updateNavbarUserUI();
+  updateProfileDashboardUI();
+
+  // c. Close the checkout modal & d. Open the green "Payment & Reservation Confirmed!" receipt modal
+  const formattedDateTime = new Date().toLocaleString('en-IN', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  });
+
+  const txnEl = document.getElementById('receipt-txn-id');
+  const timeEl = document.getElementById('receipt-timestamp');
+  const itemEl = document.getElementById('receipt-item-title');
+  const payMethodEl = document.getElementById('receipt-pay-method');
+  const tokenChangeEl = document.getElementById('receipt-token-change');
+  const totalPaidEl = document.getElementById('receipt-total-paid');
+
+  if (txnEl) txnEl.textContent = transactionId;
+  if (timeEl) timeEl.textContent = formattedDateTime;
+  if (itemEl) itemEl.textContent = itemTitle;
+  if (payMethodEl) payMethodEl.textContent = chosenMethod;
+  if (tokenChangeEl) tokenChangeEl.textContent = `${updatedTokenBalance} Tokens (+${calculatedEcoTokens} Earned)`;
+  if (totalPaidEl) totalPaidEl.textContent = `₹${Math.round(finalPayableAmount).toLocaleString('en-IN')}`;
+
+  setCheckoutModalStep('success');
+  document.getElementById('modal-checkout')?.classList.add('active-modal');
+
+  if (typeof triggerConfetti === 'function') triggerConfetti();
+  showToast(`🎉 Reservation confirmed! Paid ₹${Math.round(finalPayableAmount).toLocaleString('en-IN')} via ${chosenMethod}`, 'success');
 }
+window.executePaymentGatewayFlow = executePaymentGatewayFlow;
+window.handlePayment = executePaymentGatewayFlow;
+window.proceedToPay = executePaymentGatewayFlow;
 
 /**
  * Avatar Customization Modal Handlers

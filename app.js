@@ -8,7 +8,7 @@
 // Application Global State
 const TourVerseState = {
   user: null,
-  authToken: localStorage.getItem('safarsetu_jwt_token') || null,
+  authToken: localStorage.getItem('token') || localStorage.getItem('safarsetu_jwt_token') || null,
   currentDestination: null,
   currentItinerary: null,
   currentOccupancy: 50,
@@ -29,7 +29,7 @@ const TourVerseState = {
 
 // Helper: Authenticated Headers with JWT Bearer Token
 function getAuthHeaders(extraHeaders = {}) {
-  const token = localStorage.getItem('safarsetu_jwt_token') || TourVerseState.authToken;
+  const token = localStorage.getItem('token') || localStorage.getItem('safarsetu_jwt_token') || TourVerseState.authToken;
   const headers = { 'Content-Type': 'application/json', ...extraHeaders };
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
@@ -92,8 +92,10 @@ function updateThemeIcon(theme) {
  * Mandatory Auth Gatekeeper Engine
  */
 async function initAuthGatekeeper() {
-  const token = localStorage.getItem('safarsetu_jwt_token');
+  const token = localStorage.getItem('token') || localStorage.getItem('safarsetu_jwt_token');
   if (token) {
+    localStorage.setItem('token', token);
+    localStorage.setItem('safarsetu_jwt_token', token);
     try {
       const res = await fetch('/api/user/me', {
         headers: { 'Authorization': `Bearer ${token}` }
@@ -105,6 +107,7 @@ async function initAuthGatekeeper() {
         localStorage.setItem('tourverse_user', JSON.stringify(TourVerseState.user));
         localStorage.setItem('safarsetu_user', JSON.stringify(TourVerseState.user));
       } else {
+        localStorage.removeItem('token');
         localStorage.removeItem('safarsetu_jwt_token');
         localStorage.removeItem('tourverse_user');
         localStorage.removeItem('safarsetu_user');
@@ -225,6 +228,7 @@ function initGatekeeperFormEvents() {
           }
 
           // Persist JWT token & authenticated user
+          localStorage.setItem('token', data.token);
           localStorage.setItem('safarsetu_jwt_token', data.token);
           TourVerseState.authToken = data.token;
           TourVerseState.user = data.user;
@@ -265,6 +269,7 @@ function initGatekeeperFormEvents() {
           }
 
           // Persist JWT token & authenticated user
+          localStorage.setItem('token', data.token);
           localStorage.setItem('safarsetu_jwt_token', data.token);
           TourVerseState.authToken = data.token;
           TourVerseState.user = data.user;
@@ -310,6 +315,7 @@ function initGatekeeperFormEvents() {
           throw new Error(data.message || 'Failed to authenticate demo user');
         }
 
+        localStorage.setItem('token', data.token);
         localStorage.setItem('safarsetu_jwt_token', data.token);
         TourVerseState.authToken = data.token;
         TourVerseState.user = data.user;
@@ -336,6 +342,7 @@ function initGatekeeperFormEvents() {
   const profileLogoutBtn = document.getElementById('btn-logout-profile');
 
   const handleLogout = () => {
+    localStorage.removeItem('token');
     localStorage.removeItem('safarsetu_jwt_token');
     localStorage.removeItem('tourverse_user');
     localStorage.removeItem('safarsetu_user');
@@ -1978,12 +1985,117 @@ function downloadReceiptFile(receipt) {
 }
 
 /**
+ * Dynamically loads the official Razorpay Checkout SDK if not already present on window.
+ */
+function ensureRazorpayScriptLoaded() {
+  if (typeof window.Razorpay === 'function') {
+    return Promise.resolve(true);
+  }
+  return new Promise((resolve) => {
+    const existing = document.querySelector('script[src*="checkout.razorpay.com"]');
+    if (existing) {
+      if (typeof window.Razorpay === 'function') return resolve(true);
+      existing.addEventListener('load', () => resolve(typeof window.Razorpay === 'function'));
+      existing.addEventListener('error', () => resolve(false));
+      setTimeout(() => resolve(typeof window.Razorpay === 'function'), 1500);
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    script.onload = () => {
+      console.log('✓ Official Razorpay Checkout SDK loaded dynamically.');
+      resolve(typeof window.Razorpay === 'function');
+    };
+    script.onerror = (err) => {
+      console.error('Failed to load Razorpay script dynamically:', err);
+      resolve(false);
+    };
+    document.head.appendChild(script);
+  });
+}
+
+/**
+ * Renders verified transaction receipt, updates wallet & booking state, and switches modal to success step.
+ */
+function showSuccessModal(data) {
+  const item = TourVerseState.activeCheckoutItem || {};
+  const confirmedBooking = data.data?.booking;
+  if (data.data?.updatedWallet && TourVerseState.user) {
+    TourVerseState.user.wallet = data.data.updatedWallet;
+  }
+  if (TourVerseState.user) {
+    if (!TourVerseState.user.activeBookings) TourVerseState.user.activeBookings = [];
+    if (confirmedBooking) {
+      TourVerseState.user.activeBookings.unshift(confirmedBooking);
+    }
+    if (item.itemType === 'pro') {
+      TourVerseState.user.isPro = true;
+    }
+  }
+
+  saveLocalUserFallback();
+  updateNavbarUserUI();
+  updateProfileDashboardUI();
+
+  // Populate digital receipt box
+  const timestampStr = data.date || new Date().toLocaleString('en-IN');
+  const paymentId = data.transactionId || data.data?.paymentId || (data.data?.booking?.paymentId) || 'PAY-VERIFIED';
+  const orderId = data.orderId || data.data?.orderId || '';
+  const totalPaidRupees = data.amount || Math.round((data.data?.amount || 0) / 100);
+  const tokensAwarded = data.tokensEarned || 120;
+  const tokensUsed = item.tokensUsed || 0;
+
+  const receiptData = {
+    txnId: paymentId,
+    orderId: orderId,
+    timestamp: timestampStr,
+    itemTitle: data.item || item.title || 'SafarSetu Booking',
+    itemType: item.itemType || 'booking',
+    userName: TourVerseState.user?.name || 'Tourist',
+    userEmail: TourVerseState.user?.email || 'tourist@safarsetu.com',
+    dates: document.getElementById('checkout-date-input')?.value || 'Flexible',
+    guests: parseInt(document.getElementById('checkout-guests-input')?.value) || 1,
+    basePrice: item.basePrice || totalPaidRupees,
+    discountSaved: item.discountSaved || 0,
+    tokensUsed: tokensUsed,
+    taxes: Math.round(totalPaidRupees - ((item.basePrice || totalPaidRupees) - (item.discountSaved || 0) - tokensUsed * 2)),
+    taxRate: item.taxRate || (item.itemType === 'pro' ? 0.18 : 0.05),
+    totalPaid: totalPaidRupees,
+    paymentMethod: `Razorpay (${paymentId})`,
+    tokensAwarded: tokensAwarded
+  };
+  TourVerseState.lastSuccessfulTransaction = receiptData;
+
+  const txnEl = document.getElementById('receipt-txn-id');
+  const orderEl = document.getElementById('receipt-order-id');
+  const timeEl = document.getElementById('receipt-timestamp');
+  const itemEl = document.getElementById('receipt-item-title');
+  const payMethodEl = document.getElementById('receipt-pay-method');
+  const tokenChangeEl = document.getElementById('receipt-token-change');
+  const totalPaidEl = document.getElementById('receipt-total-paid');
+
+  if (txnEl) txnEl.textContent = paymentId;
+  if (orderEl) orderEl.textContent = orderId;
+  if (timeEl) timeEl.textContent = timestampStr;
+  if (itemEl) itemEl.textContent = data.item || item.title || 'SafarSetu Booking';
+  if (payMethodEl) payMethodEl.textContent = `Official Razorpay (${paymentId})`;
+  if (tokenChangeEl) tokenChangeEl.textContent = `+${tokensAwarded} Tokens Awarded (-${tokensUsed} Redeemed)`;
+  if (totalPaidEl) totalPaidEl.textContent = `₹${totalPaidRupees.toLocaleString()}`;
+
+  setCheckoutModalStep('success');
+  if (typeof triggerConfetti === 'function') triggerConfetti();
+  showToast(`🎉 Payment of ₹${totalPaidRupees.toLocaleString()} verified and booked via Razorpay!`, 'success');
+}
+window.showSuccessModal = showSuccessModal;
+
+/**
  * Official Razorpay Live Production Checkout Workflow
- * 1. Calls POST /api/payments/create-order on SafarSetu server.
- * 2. Invokes new Razorpay(options).open() to present the official Razorpay modal.
- * 3. Handles SDK payment response inside options.handler.
- * 4. Calls POST /api/payments/verify-signature for HMAC-SHA256 verification and SQLite persistence.
- * 5. Displays verified digital receipt and updates user profile & bookings.
+ * 1. Checks / injects Razorpay SDK if not present.
+ * 2. Fetches keyId and creates order on SafarSetu server.
+ * 3. Launches official window.Razorpay modal with keyId and orderData.
+ * 4. Verifies payment signature at /api/payments/verify.
+ * 5. Calls showSuccessModal(data) upon successful verification.
  */
 async function executePaymentGatewayFlow() {
   const item = TourVerseState.activeCheckoutItem;
@@ -1991,6 +2103,11 @@ async function executePaymentGatewayFlow() {
     showToast('Please sign in to complete your reservation', 'danger');
     window.location.hash = '#auth';
     return;
+  }
+
+  // Pre-check or dynamically inject script
+  if (typeof window.Razorpay !== 'function') {
+    await ensureRazorpayScriptLoaded();
   }
 
   const dates = document.getElementById('checkout-date-input')?.value || 'Flexible';
@@ -2001,15 +2118,25 @@ async function executePaymentGatewayFlow() {
   const payBtnLabel = document.getElementById('btn-pay-text-label');
   const originalLabel = payBtnLabel ? payBtnLabel.textContent : 'Pay with Razorpay';
 
-  if (payBtn) {
-    payBtn.disabled = true;
-  }
-  if (payBtnLabel) {
-    payBtnLabel.textContent = 'Contacting Razorpay Gateway...';
-  }
+  if (payBtn) payBtn.disabled = true;
+  if (payBtnLabel) payBtnLabel.textContent = 'Contacting Razorpay Gateway...';
 
   try {
-    // 1. Server-side Order Creation via Razorpay Orders API
+    // a. Fetch the keyId from /api/config/razorpay-key
+    let keyId = null;
+    try {
+      const cfgRes = await fetch('/api/config/razorpay-key');
+      if (cfgRes.ok) {
+        const cfgData = await cfgRes.json();
+        if (cfgData && cfgData.keyId) {
+          keyId = cfgData.keyId;
+        }
+      }
+    } catch (cfgErr) {
+      console.warn('Could not pre-fetch keyId from /api/config/razorpay-key:', cfgErr);
+    }
+
+    // Call server order creation route
     const orderRes = await fetch('/api/payments/create-order', {
       method: 'POST',
       headers: getAuthHeaders(),
@@ -2028,138 +2155,60 @@ async function executePaymentGatewayFlow() {
 
     const orderJson = await orderRes.json();
     if (!orderRes.ok || !orderJson.success) {
-      throw new Error(orderJson.message || 'Server failed to calculate price and initialize Razorpay order.');
+      throw new Error(orderJson.message || 'Server failed to calculate price and initialize order.');
     }
 
     const orderData = orderJson.data || orderJson;
-    const orderId = orderJson.orderId || orderData.orderId;
-    const amount = orderJson.amount || orderData.amount;
-    const currency = orderJson.currency || orderData.currency || 'INR';
-    const keyId = orderJson.keyId || orderData.keyId;
-
-    if (typeof window.Razorpay !== 'function') {
-      throw new Error('Razorpay Checkout SDK is not loaded. Please check your internet connection.');
+    if (!keyId) {
+      keyId = orderJson.keyId || orderData.keyId;
     }
 
-    // 2. Configure Official Razorpay Checkout Modal
-    const options = {
+    // b. Check if window.Razorpay is defined. If it's not defined, dynamically inject before failing.
+    if (typeof window.Razorpay !== 'function') {
+      const loaded = await ensureRazorpayScriptLoaded();
+      if (!loaded || typeof window.Razorpay !== 'function') {
+        throw new Error('Razorpay Checkout SDK is not loaded. Please verify your internet connection.');
+      }
+    }
+
+    const currentUser = TourVerseState.user;
+
+    // d. Open the Razorpay modal
+    const rzp = new window.Razorpay({
       key: keyId,
-      amount: amount,
-      currency: currency,
+      amount: orderData.amount,
+      currency: 'INR',
       name: 'SafarSetu',
-      description: `${item.title} (${item.itemType.toUpperCase()})`,
-      image: 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=128&q=80',
-      order_id: orderId,
+      description: 'Eco-Travel Booking',
+      order_id: orderData.orderId,
       handler: async function (response) {
-        console.log('✓ Razorpay payment response received:', response);
         try {
-          showToast('🔒 Verifying payment signature with SafarSetu security vault...', 'info');
-
-          // 3. Cryptographic HMAC-SHA256 Signature Verification & SQLite Persistence
-          const verifyRes = await fetch('/api/payments/verify-signature', {
+          showToast('🔒 Verifying payment with SafarSetu security vault...', 'info');
+          // send response.razorpay_payment_id, response.razorpay_order_id, response.razorpay_signature to /api/payments/verify
+          const verifyRes = await fetch('/api/payments/verify', {
             method: 'POST',
-            headers: getAuthHeaders(),
-            body: JSON.stringify({
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-              itemType: item.itemType,
-              title: item.title,
-              destination: TourVerseState.currentDestination?.name || 'Manali',
-              dateRange: dates,
-              guests: guests,
-              basePrice: item.basePrice,
-              discountSaved: item.discountSaved,
-              tokensUsed: tokensUsed,
-              meta: item.meta
-            })
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token') || localStorage.getItem('safarsetu_jwt_token') || TourVerseState.authToken || ''}`
+            },
+            body: JSON.stringify(response)
           });
-
-          const verifyJson = await verifyRes.json();
-          if (!verifyRes.ok || !verifyJson.success) {
-            throw new Error(verifyJson.message || 'Payment signature verification rejected.');
+          const data = await verifyRes.json();
+          if (data.success) {
+            showSuccessModal(data);
+          } else {
+            throw new Error(data.message || 'Payment signature verification failed.');
           }
-
-          // 4. Update Client State & Persisted Profile
-          const confirmedBooking = verifyJson.data?.booking;
-          if (verifyJson.data?.updatedWallet) {
-            TourVerseState.user.wallet = verifyJson.data.updatedWallet;
-          }
-          if (!TourVerseState.user.activeBookings) TourVerseState.user.activeBookings = [];
-          if (confirmedBooking) {
-            TourVerseState.user.activeBookings.unshift(confirmedBooking);
-          }
-          if (item.itemType === 'pro') {
-            TourVerseState.user.isPro = true;
-          }
-
-          saveLocalUserFallback();
-          updateNavbarUserUI();
-          updateProfileDashboardUI();
-
-          // 5. Populate Digital Receipt Box
-          const timestampStr = verifyJson.date || new Date().toLocaleString('en-IN');
-          const paymentId = response.razorpay_payment_id;
-          const totalPaidRupees = Math.round(amount / 100);
-
-          const receiptData = {
-            txnId: paymentId,
-            orderId: orderId,
-            timestamp: timestampStr,
-            itemTitle: item.title,
-            itemType: item.itemType,
-            userName: TourVerseState.user.name,
-            userEmail: TourVerseState.user.email,
-            dates,
-            guests,
-            basePrice: item.basePrice,
-            discountSaved: item.discountSaved,
-            tokensUsed,
-            taxes: Math.round(totalPaidRupees - (item.basePrice - item.discountSaved - tokensUsed * 2)),
-            taxRate: item.taxRate || (item.itemType === 'pro' ? 0.18 : 0.05),
-            totalPaid: totalPaidRupees,
-            paymentMethod: `Razorpay (${paymentId})`,
-            tokensAwarded: verifyJson.tokensEarned || 120
-          };
-          TourVerseState.lastSuccessfulTransaction = receiptData;
-
-          const txnEl = document.getElementById('receipt-txn-id');
-          const orderEl = document.getElementById('receipt-order-id');
-          const timeEl = document.getElementById('receipt-timestamp');
-          const itemEl = document.getElementById('receipt-item-title');
-          const payMethodEl = document.getElementById('receipt-pay-method');
-          const tokenChangeEl = document.getElementById('receipt-token-change');
-          const totalPaidEl = document.getElementById('receipt-total-paid');
-
-          if (txnEl) txnEl.textContent = paymentId;
-          if (orderEl) orderEl.textContent = orderId;
-          if (timeEl) timeEl.textContent = timestampStr;
-          if (itemEl) itemEl.textContent = item.title;
-          if (payMethodEl) payMethodEl.textContent = `Official Razorpay (${paymentId})`;
-          if (tokenChangeEl) tokenChangeEl.textContent = `+${verifyJson.tokensEarned || 120} Tokens Awarded (-${tokensUsed} Redeemed)`;
-          if (totalPaidEl) totalPaidEl.textContent = `₹${totalPaidRupees.toLocaleString()}`;
-
-          setCheckoutModalStep('success');
-          triggerConfetti();
-          showToast(`🎉 Payment of ₹${totalPaidRupees.toLocaleString()} verified and booked via Razorpay!`, 'success');
         } catch (verifyErr) {
           console.error('Signature verification error:', verifyErr);
           showToast(`❌ Verification Error: ${verifyErr.message}`, 'danger');
         }
       },
       prefill: {
-        name: TourVerseState.user.name,
-        email: TourVerseState.user.email,
-        contact: '9876543210'
+        name: currentUser?.name || 'Tourist',
+        email: currentUser?.email || 'tourist@safarsetu.com'
       },
-      notes: {
-        booking_title: item.title,
-        item_type: item.itemType,
-        destination: TourVerseState.currentDestination?.name || 'Manali'
-      },
-      theme: {
-        color: '#10B981' // SafarSetu Emerald
-      },
+      theme: { color: '#059669' },
       modal: {
         ondismiss: function () {
           showToast('Razorpay payment cancelled.', 'info');
@@ -2167,10 +2216,8 @@ async function executePaymentGatewayFlow() {
           if (payBtnLabel) payBtnLabel.textContent = originalLabel;
         }
       }
-    };
+    });
 
-    // 6. Open the official Razorpay Checkout modal
-    const rzp = new window.Razorpay(options);
     rzp.on('payment.failed', function (failResp) {
       console.error('Razorpay payment failed:', failResp.error);
       showToast(`⚠️ Payment Failed: ${failResp.error.description || failResp.error.reason}`, 'danger');
@@ -2336,6 +2383,7 @@ function initDangerZoneHandlers() {
       }
 
       // Wipe localStorage and session state
+      localStorage.removeItem('token');
       localStorage.removeItem('safarsetu_jwt_token');
       localStorage.removeItem('tourverse_user');
       localStorage.removeItem('safarsetu_user');

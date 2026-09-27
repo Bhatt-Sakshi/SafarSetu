@@ -32,21 +32,39 @@ const JWT_SECRET = process.env.JWT_SECRET || 'safarsetu_production_grade_jwt_sec
 const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID;
 const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
 
-// Initialize official Razorpay SDK instance
+// Initialize official Razorpay SDK instance with dynamic reload support
 let razorpay = null;
-try {
-  if (RAZORPAY_KEY_ID && RAZORPAY_KEY_SECRET) {
-    razorpay = new Razorpay({
-      key_id: RAZORPAY_KEY_ID,
-      key_secret: RAZORPAY_KEY_SECRET
-    });
-    console.log('✓ Official Razorpay SDK initialized with Key ID:', RAZORPAY_KEY_ID);
-  } else {
-    console.warn('⚠️ Razorpay credentials missing in environment (.env).');
+function getRazorpayInstance() {
+  let keyId = process.env.RAZORPAY_KEY_ID || RAZORPAY_KEY_ID;
+  let keySecret = process.env.RAZORPAY_KEY_SECRET || RAZORPAY_KEY_SECRET;
+  if (!keyId || !keySecret) {
+    try {
+      require('dotenv').config();
+      keyId = process.env.RAZORPAY_KEY_ID || RAZORPAY_KEY_ID;
+      keySecret = process.env.RAZORPAY_KEY_SECRET || RAZORPAY_KEY_SECRET;
+    } catch (_) {}
   }
-} catch (e) {
-  console.error('Razorpay initialization error:', e.message);
+  if (!keyId || !keySecret) {
+    return null;
+  }
+  if (!razorpay || razorpay.key_id !== keyId) {
+    try {
+      razorpay = new Razorpay({
+        key_id: keyId,
+        key_secret: keySecret
+      });
+      console.log('✓ Official Razorpay SDK initialized with Key ID:', keyId);
+    } catch (e) {
+      console.error('Razorpay initialization error:', e.message);
+      return null;
+    }
+  }
+  return razorpay;
 }
+getRazorpayInstance();
+
+// In-memory cache of pending orders for signature verification metadata restoration
+const pendingOrders = new Map();
 
 // Middleware
 app.use(cors());
@@ -432,9 +450,13 @@ app.get('/api/profile', optionalAuth, (req, res) => {
 });
 
 // ========================================================
-// ========================================================
 // 💳 3. PRODUCTION-GRADE PAYMENT INTEGRATION (OFFICIAL RAZORPAY SDK)
 // ========================================================
+
+// Configuration endpoint exposing public Razorpay Key ID
+app.get('/api/config/razorpay-key', (req, res) => {
+  res.json({ keyId: process.env.RAZORPAY_KEY_ID || RAZORPAY_KEY_ID || '' });
+});
 
 // Create Razorpay Order: Calls razorpay.orders.create({ amount, currency: 'INR', receipt })
 app.post('/api/payments/create-order', optionalAuth, async (req, res) => {
@@ -472,7 +494,8 @@ app.post('/api/payments/create-order', optionalAuth, async (req, res) => {
 
     const receipt = `rcpt_${Date.now().toString(36)}_${Math.random().toString(36).substring(2, 6)}`;
 
-    if (!razorpay) {
+    const rzp = getRazorpayInstance();
+    if (!rzp) {
       return res.status(500).json({
         success: false,
         message: 'Razorpay SDK is not initialized. Please verify RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in .env'
@@ -480,7 +503,7 @@ app.post('/api/payments/create-order', optionalAuth, async (req, res) => {
     }
 
     // Call official Razorpay Orders API
-    const rzpOrder = await razorpay.orders.create({
+    const rzpOrder = await rzp.orders.create({
       amount: amountInPaise,
       currency: 'INR',
       receipt: receipt,
@@ -493,18 +516,35 @@ app.post('/api/payments/create-order', optionalAuth, async (req, res) => {
 
     console.log(`✓ Created official Razorpay order ${rzpOrder.id} for ₹${finalAmount} (${amountInPaise} paise)`);
 
+    // Store order details in-memory for signature verification metadata recovery
+    pendingOrders.set(rzpOrder.id, {
+      userId: user ? user.id : 'demo_user_aarav',
+      itemType,
+      title,
+      destination: (meta && meta.destination) || 'Manali',
+      dateRange: dateRange || 'Flexible',
+      guests: guests || 1,
+      basePrice: bPrice,
+      discountSaved: dSaved,
+      tokensUsed: tUsed,
+      finalAmount,
+      meta
+    });
+
+    const activeKeyId = process.env.RAZORPAY_KEY_ID || RAZORPAY_KEY_ID || '';
+
     res.json({
       success: true,
       orderId: rzpOrder.id,
       amount: rzpOrder.amount,
       currency: rzpOrder.currency,
-      keyId: RAZORPAY_KEY_ID,
+      keyId: activeKeyId,
       data: {
         orderId: rzpOrder.id,
         amount: rzpOrder.amount,
         amountRupees: finalAmount,
         currency: rzpOrder.currency,
-        keyId: RAZORPAY_KEY_ID,
+        keyId: activeKeyId,
         breakdown: {
           basePrice: bPrice,
           discountSaved: dSaved,
@@ -529,16 +569,7 @@ function verifyRazorpaySignatureHandler(req, res) {
     const {
       razorpay_order_id,
       razorpay_payment_id,
-      razorpay_signature,
-      itemType = 'stay',
-      title = 'SafarSetu Booking',
-      destination = 'Manali',
-      dateRange = 'Flexible',
-      guests = 1,
-      basePrice,
-      discountSaved = 0,
-      tokensUsed = 0,
-      meta = {}
+      razorpay_signature
     } = req.body;
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
@@ -560,16 +591,26 @@ function verifyRazorpaySignatureHandler(req, res) {
       });
     }
 
-    // Authentic signature verified! Proceed with SQLite database persistence
-    const user = req.user || db.prepare('SELECT * FROM users WHERE id = ?').get('demo_user_aarav');
-    const bPrice = Math.max(0, parseFloat(basePrice) || 0);
-    const dSaved = Math.max(0, parseFloat(discountSaved) || 0);
-    const tUsed = Math.max(0, parseInt(tokensUsed) || 0);
+    // Retrieve cached order details from create-order or request body
+    const savedOrder = pendingOrders.get(razorpay_order_id) || {};
+    const itemType = req.body.itemType || savedOrder.itemType || 'stay';
+    const title = req.body.title || savedOrder.title || 'SafarSetu Booking';
+    const destination = req.body.destination || savedOrder.destination || 'Manali';
+    const dateRange = req.body.dateRange || savedOrder.dateRange || 'Flexible';
+    const guests = req.body.guests !== undefined ? (parseInt(req.body.guests) || 1) : (savedOrder.guests || 1);
+    const bPrice = req.body.basePrice !== undefined ? Math.max(0, parseFloat(req.body.basePrice) || 0) : (savedOrder.basePrice || 0);
+    const dSaved = req.body.discountSaved !== undefined ? Math.max(0, parseFloat(req.body.discountSaved) || 0) : (savedOrder.discountSaved || 0);
+    const tUsed = req.body.tokensUsed !== undefined ? Math.max(0, parseInt(req.body.tokensUsed) || 0) : (savedOrder.tokensUsed || 0);
+    const meta = req.body.meta || savedOrder.meta || {};
+
     const tokenDiscount = tUsed * 2;
     const taxRate = itemType === 'pro' ? 0.18 : 0.05;
     const subtotal = Math.max(0, bPrice - dSaved - tokenDiscount);
     const taxes = Math.round(subtotal * taxRate);
-    const totalPaid = subtotal + taxes;
+    const totalPaid = savedOrder.finalAmount || (subtotal + taxes);
+
+    // Authentic signature verified! Proceed with SQLite database persistence
+    const user = req.user || db.prepare('SELECT * FROM users WHERE id = ?').get(savedOrder.userId || 'demo_user_aarav');
 
     const isPro = Boolean(user && user.is_pro) || itemType === 'pro';
     const multiplier = isPro ? 2 : 1;
@@ -591,7 +632,7 @@ function verifyRazorpaySignatureHandler(req, res) {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       bookingId,
-      user ? user.id : 'demo_user_aarav',
+      user ? user.id : (savedOrder.userId || 'demo_user_aarav'),
       itemType,
       title,
       totalPaid,
@@ -604,6 +645,9 @@ function verifyRazorpaySignatureHandler(req, res) {
       parseInt(guests) || 1,
       JSON.stringify(meta || {})
     );
+
+    // Remove from in-memory pending orders map
+    pendingOrders.delete(razorpay_order_id);
 
     // Update user wallet & PRO subscription in SQLite
     if (user) {

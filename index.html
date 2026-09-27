@@ -1,18 +1,23 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SafarSetu — Discover the Soul of India | Modern Indian Travel & Booking</title>
-  <meta name="description" content="SafarSetu — Discover the Soul of India. Modern Indian travel and tourism booking web portal featuring dynamic any-destination trip itineraries, multi-modal transit (Vande Bharat, EV buses), certified heritage stays, authentic GI-tagged crafts, and real-time mountain hazard alerts.">
-  
+  <meta name="description"
+    content="SafarSetu — Discover the Soul of India. Modern Indian travel and tourism booking web portal featuring dynamic any-destination trip itineraries, multi-modal transit (Vande Bharat, EV buses), certified heritage stays, authentic GI-tagged crafts, and real-time mountain hazard alerts.">
+
   <!-- Favicon & Open Graph -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
-  
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+
   <!-- Leaflet.js Interactive Mapping CSS & JS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
   <!-- Canvas Confetti for Booking Celebrations & Token Rewards -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
@@ -21,7 +26,10 @@
 
   <!-- Application Stylesheet with Nature Sage & Emerald Forest Palette -->
   <link rel="stylesheet" href="styles.css">
+
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
+
 <body>
 
   <!-- PERSISTENT NAVIGATION HEADER -->
@@ -32,7 +40,9 @@
         <div class="brand-logo-icon">🌿</div>
         <div class="brand-text-group">
           <div class="brand-title">Safar<span class="accent-verse">Setu</span></div>
-          <span style="font-size: 0.65rem; color: var(--text-secondary); font-weight: 600; letter-spacing: 0.02em;">Discover the Soul of India</span>
+          <span
+            style="font-size: 0.65rem; color: var(--text-secondary); font-weight: 600; letter-spacing: 0.02em;">Discover
+            the Soul of India</span>
         </div>
       </a>
 
@@ -52,7 +62,8 @@
       <!-- Right Action Items -->
       <div class="nav-actions">
         <!-- Live Eco-Tokens Balance Pill -->
-        <div class="wallet-badge-pill" id="navbar-wallet-btn" title="View Eco-Tokens Vault" onclick="location.hash='#profile'">
+        <div class="wallet-badge-pill" id="navbar-wallet-btn" title="View Eco-Tokens Vault"
+          onclick="location.hash='#profile'">
           <span>🪙</span>
           <span id="nav-token-balance">500</span>
           <small style="font-size: 0.7rem; opacity: 0.85;">Tokens</small>
@@ -74,13 +85,16 @@
         </div>
 
         <!-- Dark / Light Theme Toggle -->
-        <button class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle Dark and Light Mode" title="Toggle Dark/Light Mode">
+        <button class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle Dark and Light Mode"
+          title="Toggle Dark/Light Mode">
           <span id="theme-toggle-icon">🌙</span>
         </button>
 
         <!-- User Profile Avatar & Name Tag -->
         <button class="nav-avatar-btn" id="navbar-avatar-btn" onclick="location.hash='#profile'" title="User Profile">
-          <img id="nav-user-avatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80" alt="User Avatar">
+          <img id="nav-user-avatar"
+            src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80"
+            alt="User Avatar">
         </button>
 
         <!-- Sign Out Button -->
@@ -98,14 +112,17 @@
         <div class="hazard-siren-icon">🚨</div>
         <div>
           <h2 class="hazard-headline" id="hazard-banner-title">
-            HIGH LANDSLIDE RISK ALERT: Heavy rainfall detected along mountain passes. High risk of rockfalls and road closures.
+            HIGH LANDSLIDE RISK ALERT: Heavy rainfall detected along mountain passes. High risk of rockfalls and road
+            closures.
           </h2>
           <p class="hazard-subline" id="hazard-banner-subtitle">
             🚧 Disaster Authority Advisory: Travel restricted during night hours.
           </p>
           <div style="margin-top: 0.35rem; display: flex; align-items: center; gap: 0.6rem;">
-            <span class="terrain-safety-badge badge-extreme-hazard" id="hazard-terrain-badge">🔴 Extreme Landslide Hazard</span>
-            <span style="font-size: 0.8rem; color: #FEE2E2;" id="hazard-impacted-routes">Impacted: Rohtang Pass NH-3, Solang Ridge</span>
+            <span class="terrain-safety-badge badge-extreme-hazard" id="hazard-terrain-badge">🔴 Extreme Landslide
+              Hazard</span>
+            <span style="font-size: 0.8rem; color: #FEE2E2;" id="hazard-impacted-routes">Impacted: Rohtang Pass NH-3,
+              Solang Ridge</span>
           </div>
         </div>
       </div>
@@ -113,12 +130,15 @@
         <button class="btn-reroute-safety" id="btn-accept-safe-reroute">
           <span>🛡️</span>
           <span>Safe Reroute Recommendation</span>
-          <span style="background: rgba(185, 28, 28, 0.15); color: #7F1D1D; padding: 2px 7px; border-radius: 999px; font-size: 0.75rem; font-weight: 800;">+100 Tokens</span>
+          <span
+            style="background: rgba(185, 28, 28, 0.15); color: #7F1D1D; padding: 2px 7px; border-radius: 999px; font-size: 0.75rem; font-weight: 800;">+100
+            Tokens</span>
         </button>
         <button class="btn-sos-emergency" id="btn-open-sos-modal">
           <span>🆘</span> Emergency SOS
         </button>
-        <button class="hazard-dismiss-btn" id="btn-dismiss-hazard" aria-label="Dismiss alert" title="Dismiss Alert">✕</button>
+        <button class="hazard-dismiss-btn" id="btn-dismiss-hazard" aria-label="Dismiss alert"
+          title="Dismiss Alert">✕</button>
       </div>
     </div>
   </aside>
@@ -139,7 +159,8 @@
           </div>
           <h1 class="auth-title">Welcome to <span style="color: var(--emerald);">SafarSetu</span></h1>
           <p class="auth-subtitle">
-            Modern Indian Travel & Tourism Portal • Authentic Itineraries, Multi-Modal Transit & Mountain Safety Intelligence.
+            Modern Indian Travel & Tourism Portal • Authentic Itineraries, Multi-Modal Transit & Mountain Safety
+            Intelligence.
           </p>
 
           <!-- Toggle Tabs: Sign Up vs Sign In -->
@@ -183,7 +204,8 @@
               </div>
               <div>
                 <label class="auth-field-label" for="auth-input-email">Email Address</label>
-                <input class="auth-input-box" type="email" id="auth-input-email" placeholder="name@example.com" required>
+                <input class="auth-input-box" type="email" id="auth-input-email" placeholder="name@example.com"
+                  required>
               </div>
               <div>
                 <label class="auth-field-label" for="auth-input-password">Secure Password</label>
@@ -203,7 +225,8 @@
             </div>
 
             <!-- Submit Button -->
-            <button class="btn-primary-action" type="submit" id="auth-submit-btn" style="width: 100%; justify-content: center; padding: 0.95rem; font-size: 1.05rem;">
+            <button class="btn-primary-action" type="submit" id="auth-submit-btn"
+              style="width: 100%; justify-content: center; padding: 0.95rem; font-size: 1.05rem;">
               <span>🚀</span> Create Account & Claim 500 Tokens
             </button>
           </form>
@@ -213,7 +236,8 @@
             <span>⚡</span> Explore as Guest Demo (Quick Access)
           </button>
 
-          <div style="margin-top: 1.4rem; font-size: 0.78rem; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+          <div
+            style="margin-top: 1.4rem; font-size: 0.78rem; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
             <span>🔒</span> 256-Bit Encrypted Session • SafarSetu Travel Portal
           </div>
         </div>
@@ -227,9 +251,11 @@
       <!-- Nature Forest Hero Stage with Dynamic Reactive Background Engine -->
       <div class="hero-netflix-stage" id="hero-netflix-stage">
         <!-- Dynamic Crossfade Background Layers -->
-        <div class="hero-bg-layer hero-bg-active" id="hero-bg-layer-1" style="background-image: url('https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=1920&q=85');"></div>
+        <div class="hero-bg-layer hero-bg-active" id="hero-bg-layer-1"
+          style="background-image: url('https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=1920&q=85');">
+        </div>
         <div class="hero-bg-layer" id="hero-bg-layer-2"></div>
-        
+
         <!-- Protective Dark Vignette Gradient (Requirement 3) -->
         <div class="hero-gradient-overlay"></div>
 
@@ -241,14 +267,17 @@
             Discover Incredible India with <span class="glow-accent">SafarSetu</span>
           </h1>
           <p class="hero-subhead">
-            Multi-modal transit booking (Vande Bharat & EV buses), verified heritage stays, real-time mountain landslide alerts, and direct GI-tagged artisan craft marketplace.
+            Multi-modal transit booking (Vande Bharat & EV buses), verified heritage stays, real-time mountain landslide
+            alerts, and direct GI-tagged artisan craft marketplace.
           </p>
 
           <!-- Dynamic Any-Destination Global Search Engine Bar -->
           <div class="global-search-wrapper">
             <div class="search-field-unit">
               <span style="font-size: 1.2rem;">📍</span>
-              <input type="text" id="home-dest-input" placeholder="Type ANY Destination (e.g., Manali, Varanasi, Jaipur, Munnar, Goa, Udaipur)..." aria-label="Destination">
+              <input type="text" id="home-dest-input"
+                placeholder="Type ANY Destination (e.g., Manali, Varanasi, Jaipur, Munnar, Goa, Udaipur)..."
+                aria-label="Destination">
             </div>
             <div class="search-field-unit" style="max-width: 170px;">
               <span style="font-size: 1.2rem;">🎒</span>
@@ -305,14 +334,19 @@
       </div>
 
       <!-- Live Hazard & Innovation Ticker -->
-      <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 0.9rem 1.4rem; margin-bottom: 3rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+      <div
+        style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 0.9rem 1.4rem; margin-bottom: 3rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
         <div style="display: flex; align-items: center; gap: 0.8rem;">
-          <span style="background: var(--caramel); color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 800;">LIVE DISPATCH</span>
+          <span
+            style="background: var(--caramel); color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 800;">LIVE
+            DISPATCH</span>
           <span style="font-size: 0.88rem; color: var(--text-secondary);" id="live-dispatch-ticker">
-            🛰️ Satellite telemetry active: High precipitation over Rohtang Pass. Automated anti-crowd diversion engaged.
+            🛰️ Satellite telemetry active: High precipitation over Rohtang Pass. Automated anti-crowd diversion
+            engaged.
           </span>
         </div>
-        <div style="display: flex; align-items: center; gap: 1.2rem; font-size: 0.82rem; font-family: var(--font-mono);">
+        <div
+          style="display: flex; align-items: center; gap: 1.2rem; font-size: 0.82rem; font-family: var(--font-mono);">
           <span style="color: var(--sage);">● Carbon Offset: 142.8 MT</span>
           <span style="color: var(--amber);">● 1,840 Eco-Vouchers Issued</span>
         </div>
@@ -330,7 +364,8 @@
             </p>
           </div>
           <div class="carousel-controls">
-            <button class="carousel-nav-btn" onclick="scrollCarousel('gems-track', -340)" aria-label="Previous">←</button>
+            <button class="carousel-nav-btn" onclick="scrollCarousel('gems-track', -340)"
+              aria-label="Previous">←</button>
             <button class="carousel-nav-btn" onclick="scrollCarousel('gems-track', 340)" aria-label="Next">→</button>
           </div>
         </div>
@@ -351,7 +386,8 @@
             </p>
           </div>
           <div class="carousel-controls">
-            <button class="carousel-nav-btn" onclick="scrollCarousel('stays-track', -340)" aria-label="Previous">←</button>
+            <button class="carousel-nav-btn" onclick="scrollCarousel('stays-track', -340)"
+              aria-label="Previous">←</button>
             <button class="carousel-nav-btn" onclick="scrollCarousel('stays-track', 340)" aria-label="Next">→</button>
           </div>
         </div>
@@ -372,7 +408,8 @@
             </p>
           </div>
           <div class="carousel-controls">
-            <button class="carousel-nav-btn" onclick="scrollCarousel('market-track', -340)" aria-label="Previous">←</button>
+            <button class="carousel-nav-btn" onclick="scrollCarousel('market-track', -340)"
+              aria-label="Previous">←</button>
             <button class="carousel-nav-btn" onclick="scrollCarousel('market-track', 340)" aria-label="Next">→</button>
           </div>
         </div>
@@ -382,31 +419,40 @@
       </section>
 
       <!-- SafarSetu Core Experience Pillars -->
-      <section style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 2.5rem; margin-top: 2rem;">
+      <section
+        style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 2.5rem; margin-top: 2rem;">
         <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem; text-align: center;">
           Why Travelers Choose SafarSetu
         </h3>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem;">
-          <div style="background: var(--bg-secondary); padding: 1.4rem; border-radius: var(--radius-lg); border-left: 3px solid #B91C1C;">
+          <div
+            style="background: var(--bg-secondary); padding: 1.4rem; border-radius: var(--radius-lg); border-left: 3px solid #B91C1C;">
             <h4 style="font-size: 1.1rem; margin-bottom: 0.4rem; color: #FCA5A5;">🚨 Mountain Landslide Engine</h4>
             <p style="font-size: 0.86rem; color: var(--text-secondary);">
-              Automated hazard triggers for high-altitude passes during rainfall spikes with +100 Eco-Token safety reroute incentives.
+              Automated hazard triggers for high-altitude passes during rainfall spikes with +100 Eco-Token safety
+              reroute incentives.
             </p>
           </div>
-          <div style="background: var(--bg-secondary); padding: 1.4rem; border-radius: var(--radius-lg); border-left: 3px solid var(--sage);">
+          <div
+            style="background: var(--bg-secondary); padding: 1.4rem; border-radius: var(--radius-lg); border-left: 3px solid var(--sage);">
             <h4 style="font-size: 1.1rem; margin-bottom: 0.4rem; color: var(--sage);">🌐 All-India Dynamic Planner</h4>
             <p style="font-size: 0.86rem; color: var(--text-secondary);">
-              Dynamic day-by-day itinerary generation across Indian circuits with automatic geocoding & interactive route mapping.
+              Dynamic day-by-day itinerary generation across Indian circuits with automatic geocoding & interactive
+              route mapping.
             </p>
           </div>
-          <div style="background: var(--bg-secondary); padding: 1.4rem; border-radius: var(--radius-lg); border-left: 3px solid var(--caramel);">
+          <div
+            style="background: var(--bg-secondary); padding: 1.4rem; border-radius: var(--radius-lg); border-left: 3px solid var(--caramel);">
             <h4 style="font-size: 1.1rem; margin-bottom: 0.4rem; color: var(--caramel);">📉 Dynamic Off-Peak Stays</h4>
             <p style="font-size: 0.86rem; color: var(--text-secondary);">
-              Interactive occupancy slider redistributes visitor pressure, providing automatic hotel discounts and masterclass perks.
+              Interactive occupancy slider redistributes visitor pressure, providing automatic hotel discounts and
+              masterclass perks.
             </p>
           </div>
-          <div style="background: var(--bg-secondary); padding: 1.4rem; border-radius: var(--radius-lg); border-left: 3px solid var(--amber);">
-            <h4 style="font-size: 1.1rem; margin-bottom: 0.4rem; color: var(--amber);">📜 GI-Tag Authenticity Registry</h4>
+          <div
+            style="background: var(--bg-secondary); padding: 1.4rem; border-radius: var(--radius-lg); border-left: 3px solid var(--amber);">
+            <h4 style="font-size: 1.1rem; margin-bottom: 0.4rem; color: var(--amber);">📜 GI-Tag Authenticity Registry
+            </h4>
             <p style="font-size: 0.86rem; color: var(--text-secondary);">
               Direct economic empowerment of rural master craftspersons with verifiable QR provenance certificates.
             </p>
@@ -424,7 +470,8 @@
           Trip Planner & <span class="text-caramel">Itineraries</span>
         </h1>
         <p style="color: var(--text-secondary); font-size: 0.95rem;">
-          Generate custom day-by-day itineraries across popular Indian destinations with live weather alerts and interactive GPS mapping.
+          Generate custom day-by-day itineraries across popular Indian destinations with live weather alerts and
+          interactive GPS mapping.
         </p>
       </div>
 
@@ -432,16 +479,21 @@
       <div class="planner-controls-card">
         <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.2rem;">
           <div style="flex: 2; min-width: 260px;">
-            <label style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">
+            <label
+              style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">
               TYPE ANY DESTINATION:
             </label>
-            <input type="text" id="planner-dest-input" value="Manali" style="width: 100%; background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 0.75rem 1rem; font-size: 1.05rem;" placeholder="e.g. Manali, Varanasi, Jaipur, Munnar, Goa, Udaipur, Srinagar...">
+            <input type="text" id="planner-dest-input" value="Manali"
+              style="width: 100%; background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 0.75rem 1rem; font-size: 1.05rem;"
+              placeholder="e.g. Manali, Varanasi, Jaipur, Munnar, Goa, Udaipur, Srinagar...">
           </div>
           <div style="flex: 1; min-width: 150px;">
-            <label style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">
+            <label
+              style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">
               TRIP DURATION:
             </label>
-            <select id="planner-days-select" style="width: 100%; background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 0.75rem 1rem; font-size: 1rem;">
+            <select id="planner-days-select"
+              style="width: 100%; background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 0.75rem 1rem; font-size: 1rem;">
               <option value="1">1 Day Express</option>
               <option value="2">2 Days</option>
               <option value="3" selected>3 Days</option>
@@ -478,7 +530,8 @@
           <div style="font-size: 2.5rem;" id="weather-icon">🌧️</div>
           <div>
             <div class="weather-temp-big" id="weather-temp">14°C</div>
-            <div style="font-size: 0.88rem; color: var(--text-secondary);" id="weather-condition">Heavy Rain & Mountain Mist</div>
+            <div style="font-size: 0.88rem; color: var(--text-secondary);" id="weather-condition">Heavy Rain & Mountain
+              Mist</div>
           </div>
         </div>
         <div class="weather-stats-list">
@@ -526,7 +579,8 @@
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
             <h3 style="font-size: 1.3rem;">Day-by-Day Itinerary Schedule</h3>
             <div style="display: flex; gap: 0.6rem;">
-              <button class="btn-emerald-action" id="btn-save-itinerary" style="padding: 0.4rem 0.9rem; font-size: 0.82rem;">
+              <button class="btn-emerald-action" id="btn-save-itinerary"
+                style="padding: 0.4rem 0.9rem; font-size: 0.82rem;">
                 💾 Save Itinerary
               </button>
             </div>
@@ -596,7 +650,8 @@
           Smart Stays & <span class="text-caramel">Dynamic Pricing Engine</span>
         </h1>
         <p style="color: var(--text-secondary); font-size: 0.95rem;">
-          Certified eco-resorts, passive-solar mud cottages, and heritage homestays. Adjust the occupancy slider below to unlock dynamic off-peak discounts!
+          Certified eco-resorts, passive-solar mud cottages, and heritage homestays. Adjust the occupancy slider below
+          to unlock dynamic off-peak discounts!
         </p>
       </div>
 
@@ -613,14 +668,16 @@
           </div>
           <div style="text-align: right;">
             <div style="font-size: 0.75rem; color: var(--text-muted);">CURRENT DESTINATION OCCUPANCY</div>
-            <div style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 900; color: var(--sage);" id="occupancy-display">
+            <div style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 900; color: var(--sage);"
+              id="occupancy-display">
               50% (Balanced)
             </div>
           </div>
         </div>
 
         <div class="slider-container">
-          <input type="range" min="15" max="95" value="50" step="5" class="occupancy-range-slider" id="occupancy-slider" aria-label="Occupancy Slider">
+          <input type="range" min="15" max="95" value="50" step="5" class="occupancy-range-slider" id="occupancy-slider"
+            aria-label="Occupancy Slider">
           <div class="slider-scale-labels">
             <span>15% (Ultra Off-Peak: 35% Off)</span>
             <span>50% (Standard Off-Peak: 25% Off)</span>
@@ -661,7 +718,8 @@
           Hyper-Local Food, <span class="text-sage">GI Artisans</span> & Storytellers
         </h1>
         <p style="color: var(--text-secondary); font-size: 0.95rem;">
-          Direct-to-artisan revenue with 0% middleman cut. Every handicraft includes a verifiable Government of India GI-Tag certificate.
+          Direct-to-artisan revenue with 0% middleman cut. Every handicraft includes a verifiable Government of India
+          GI-Tag certificate.
         </p>
       </div>
 
@@ -690,7 +748,8 @@
           Supercharge Your Journey with <span style="color: var(--amber);">SafarSetu PRO</span>
         </h1>
         <p style="color: var(--text-secondary); font-size: 1.05rem;">
-          Priority anti-crowd alerts 30 minutes early, 2x Eco-Token rewards, exclusive 15% off-peak stay discounts, and emergency mountain evacuation protection.
+          Priority anti-crowd alerts 30 minutes early, 2x Eco-Token rewards, exclusive 15% off-peak stay discounts, and
+          emergency mountain evacuation protection.
         </p>
       </div>
 
@@ -713,7 +772,9 @@
             <li class="plan-feature-row" style="opacity: 0.5;"><span>🔒</span> VIP artisan private masterclasses</li>
             <li class="plan-feature-row" style="opacity: 0.5;"><span>🔒</span> 24/7 Priority Emergency SOS dispatch</li>
           </ul>
-          <button class="btn-emerald-action" style="width: 100%; justify-content: center; background: rgba(255,255,255,0.06); box-shadow: none;" disabled>
+          <button class="btn-emerald-action"
+            style="width: 100%; justify-content: center; background: rgba(255,255,255,0.06); box-shadow: none;"
+            disabled>
             Current Standard Plan
           </button>
         </div>
@@ -728,17 +789,25 @@
             VIP perks, maximum token multipliers & disaster rescue.
           </p>
           <div class="plan-price-big" style="color: var(--amber);">
-            ₹299 <small style="font-size: 1rem; color: var(--text-muted); font-weight: 400;">/ month or ₹2,499 / year</small>
+            ₹299 <small style="font-size: 1rem; color: var(--text-muted); font-weight: 400;">/ month or ₹2,499 /
+              year</small>
           </div>
           <ul class="plan-features-list">
-            <li class="plan-feature-row"><span>⚡</span> <strong>Priority Anti-Crowd Rerouting:</strong> Alerts 30 mins before major queues form</li>
-            <li class="plan-feature-row"><span>💸</span> <strong>Extra 15% Dynamic Discount</strong> on all partner eco-resorts</li>
-            <li class="plan-feature-row"><span>🚀</span> <strong>2x Eco-Token Multiplier</strong> on transit and artisan orders</li>
-            <li class="plan-feature-row"><span>🛡️</span> <strong>Priority Emergency SOS:</strong> Real-time mountain landslide evacuation routing</li>
-            <li class="plan-feature-row"><span>🎟️</span> <strong>VIP Fast-Track:</strong> Exclusive artisan masterclasses & heritage skips</li>
-            <li class="plan-feature-row"><span>🎁</span> <strong>+200 Welcome Bonus Eco-Tokens</strong> credited instantly</li>
+            <li class="plan-feature-row"><span>⚡</span> <strong>Priority Anti-Crowd Rerouting:</strong> Alerts 30 mins
+              before major queues form</li>
+            <li class="plan-feature-row"><span>💸</span> <strong>Extra 15% Dynamic Discount</strong> on all partner
+              eco-resorts</li>
+            <li class="plan-feature-row"><span>🚀</span> <strong>2x Eco-Token Multiplier</strong> on transit and artisan
+              orders</li>
+            <li class="plan-feature-row"><span>🛡️</span> <strong>Priority Emergency SOS:</strong> Real-time mountain
+              landslide evacuation routing</li>
+            <li class="plan-feature-row"><span>🎟️</span> <strong>VIP Fast-Track:</strong> Exclusive artisan
+              masterclasses & heritage skips</li>
+            <li class="plan-feature-row"><span>🎁</span> <strong>+200 Welcome Bonus Eco-Tokens</strong> credited
+              instantly</li>
           </ul>
-          <button class="pro-upgrade-btn" id="btn-subscribe-pro-action" style="width: 100%; justify-content: center; padding: 0.9rem; font-size: 1rem;">
+          <button class="pro-upgrade-btn" id="btn-subscribe-pro-action"
+            style="width: 100%; justify-content: center; padding: 0.9rem; font-size: 1rem;">
             <span>👑</span> Upgrade to SafarSetu PRO (₹299)
           </button>
         </div>
@@ -752,20 +821,27 @@
       <!-- Profile Header Banner -->
       <div class="profile-hero-card">
         <div class="profile-identity-group">
-          <div class="profile-avatar-wrapper" id="profile-avatar-wrapper" title="Click to customize avatar or upload photo">
-            <img class="profile-avatar-big" id="profile-page-avatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80" alt="Avatar">
-            <button class="avatar-edit-overlay-btn" id="btn-edit-avatar-overlay" aria-label="Edit Profile Picture" title="Change Avatar">📷</button>
+          <div class="profile-avatar-wrapper" id="profile-avatar-wrapper"
+            title="Click to customize avatar or upload photo">
+            <img class="profile-avatar-big" id="profile-page-avatar"
+              src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80"
+              alt="Avatar">
+            <button class="avatar-edit-overlay-btn" id="btn-edit-avatar-overlay" aria-label="Edit Profile Picture"
+              title="Change Avatar">📷</button>
           </div>
           <div>
             <div style="display: flex; align-items: center; gap: 0.6rem;">
               <h2 style="font-size: 1.6rem;" id="profile-user-name">Aarav Sharma</h2>
-              <span class="pro-upgrade-btn is-active-pro" id="profile-pro-badge" style="display: none; padding: 2px 8px; font-size: 0.72rem;">PRO VIP</span>
+              <span class="pro-upgrade-btn is-active-pro" id="profile-pro-badge"
+                style="display: none; padding: 2px 8px; font-size: 0.72rem;">PRO VIP</span>
             </div>
-            <div style="font-size: 0.88rem; color: var(--text-secondary);" id="profile-user-email">aarav.sharma@safarsetu.in</div>
+            <div style="font-size: 0.88rem; color: var(--text-secondary);" id="profile-user-email">
+              aarav.sharma@safarsetu.in</div>
             <div style="margin-top: 0.35rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
               <span class="brand-badge" id="profile-role-tag">ROLE: TOURIST</span>
               <span style="font-size: 0.8rem; color: var(--sage);" id="profile-tier-tag">Gold Eco-Explorer</span>
-              <button class="filter-chip-btn" id="btn-open-avatar-picker-modal" style="font-size: 0.76rem; padding: 0.2rem 0.65rem; border-color: var(--emerald); color: var(--emerald);">
+              <button class="filter-chip-btn" id="btn-open-avatar-picker-modal"
+                style="font-size: 0.76rem; padding: 0.2rem 0.65rem; border-color: var(--emerald); color: var(--emerald);">
                 <span>📷</span> Edit Profile Picture
               </button>
             </div>
@@ -795,7 +871,8 @@
         <div class="metric-stat-box">
           <div style="font-size: 0.82rem; color: var(--text-muted); font-weight: 700;">ECO-TOKENS WALLET</div>
           <div class="metric-number-huge text-caramel" id="metric-tokens-wallet">500</div>
-          <div style="font-size: 0.78rem; color: var(--text-secondary);">Worth ₹1,000 in stay & masterclass credits</div>
+          <div style="font-size: 0.78rem; color: var(--text-secondary);">Worth ₹1,000 in stay & masterclass credits
+          </div>
         </div>
         <div class="metric-stat-box">
           <div style="font-size: 0.82rem; color: var(--text-muted); font-weight: 700;">OFFBEAT DISCOVERIES</div>
@@ -827,7 +904,8 @@
         <h3 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 1.2rem;">
           Saved Custom Itineraries
         </h3>
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.2rem;" id="saved-itineraries-container">
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.2rem;"
+          id="saved-itineraries-container">
           <!-- Populated dynamically via JS -->
         </div>
       </div>
@@ -840,7 +918,8 @@
             <h4 style="font-size: 1.15rem; font-weight: 800; color: #FCA5A5;">Danger Zone: Account & Data Deletion</h4>
           </div>
           <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45;">
-            Permanently erase your SafarSetu account, wipe all active hotel and transit reservations, clear saved itineraries, and forfeit accumulated Eco-Tokens. This action is irreversible.
+            Permanently erase your SafarSetu account, wipe all active hotel and transit reservations, clear saved
+            itineraries, and forfeit accumulated Eco-Tokens. This action is irreversible.
           </p>
         </div>
         <button class="btn-danger-wipe" id="btn-trigger-delete-account">
@@ -855,12 +934,14 @@
        GLOBAL MODAL 1: REALISTIC MULTI-STEP CHECKOUT GATEWAY
   ======================================================== -->
   <div class="modal-overlay" id="modal-checkout">
-    <div class="modal-content-box checkout-modal-box" role="dialog" aria-modal="true" aria-labelledby="modal-booking-title">
+    <div class="modal-content-box checkout-modal-box" role="dialog" aria-modal="true"
+      aria-labelledby="modal-booking-title">
       <button class="modal-close-x" id="modal-checkout-close" aria-label="Close modal">×</button>
-      
+
       <!-- STEP 1: ORDER SUMMARY & INTERACTIVE PAYMENT METHODS -->
       <div id="checkout-form-view">
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
+        <div
+          style="display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
           <div style="display: flex; align-items: center; gap: 0.5rem;">
             <span class="hero-pill-tag" id="checkout-item-badge">SMART STAY</span>
             <span class="secure-badge-pill">🔒 256-Bit SSL Encrypted • NPCI Verified</span>
@@ -875,25 +956,37 @@
         </p>
 
         <!-- Booking Parameters Review -->
-        <div style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 0.9rem 1rem; margin: 1rem 0; display: flex; gap: 1rem; flex-wrap: wrap;">
+        <div
+          style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 0.9rem 1rem; margin: 1rem 0; display: flex; gap: 1rem; flex-wrap: wrap;">
           <div style="flex: 1; min-width: 140px;">
-            <label style="font-size: 0.74rem; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 0.25rem;">TRAVEL DATES / DURATION</label>
-            <input type="text" id="checkout-date-input" value="Oct 14 - Oct 17, 2026" style="width: 100%; background: transparent; border: 1px solid var(--border-subtle); border-radius: 4px; padding: 0.4rem 0.6rem; font-size: 0.88rem; color: var(--text-primary);">
+            <label
+              style="font-size: 0.74rem; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 0.25rem;">TRAVEL
+              DATES / DURATION</label>
+            <input type="text" id="checkout-date-input" value="Oct 14 - Oct 17, 2026"
+              style="width: 100%; background: transparent; border: 1px solid var(--border-subtle); border-radius: 4px; padding: 0.4rem 0.6rem; font-size: 0.88rem; color: var(--text-primary);">
           </div>
           <div style="width: 110px;" id="checkout-guests-group">
-            <label style="font-size: 0.74rem; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 0.25rem;">PASSENGERS / PAX</label>
-            <input type="number" id="checkout-guests-input" value="2" min="1" max="10" style="width: 100%; background: transparent; border: 1px solid var(--border-subtle); border-radius: 4px; padding: 0.4rem 0.6rem; font-size: 0.88rem; color: var(--text-primary);">
+            <label
+              style="font-size: 0.74rem; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 0.25rem;">PASSENGERS
+              / PAX</label>
+            <input type="number" id="checkout-guests-input" value="2" min="1" max="10"
+              style="width: 100%; background: transparent; border: 1px solid var(--border-subtle); border-radius: 4px; padding: 0.4rem 0.6rem; font-size: 0.88rem; color: var(--text-primary);">
           </div>
         </div>
 
         <!-- Eco-Tokens Redemption Slider -->
-        <div style="background: var(--sage-subtle); border: 1px solid rgba(52, 211, 153, 0.3); border-radius: var(--radius-md); padding: 0.9rem 1rem; margin-bottom: 1rem;">
+        <div
+          style="background: var(--sage-subtle); border: 1px solid rgba(52, 211, 153, 0.3); border-radius: var(--radius-md); padding: 0.9rem 1rem; margin-bottom: 1rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
-            <span style="font-size: 0.84rem; font-weight: 700; color: var(--sage);">Redeem Eco-Tokens for Instant Discount</span>
-            <span style="font-family: var(--font-mono); font-size: 0.86rem; font-weight: 800; color: var(--sage);" id="checkout-token-redeem-count">0 Tokens (₹0 off)</span>
+            <span style="font-size: 0.84rem; font-weight: 700; color: var(--sage);">Redeem Eco-Tokens for Instant
+              Discount</span>
+            <span style="font-family: var(--font-mono); font-size: 0.86rem; font-weight: 800; color: var(--sage);"
+              id="checkout-token-redeem-count">0 Tokens (₹0 off)</span>
           </div>
-          <input type="range" id="checkout-token-slider" min="0" max="200" value="0" step="10" style="width: 100%; accent-color: var(--sage); cursor: pointer;">
-          <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--sage); margin-top: 0.25rem;">
+          <input type="range" id="checkout-token-slider" min="0" max="200" value="0" step="10"
+            style="width: 100%; accent-color: var(--sage); cursor: pointer;">
+          <div
+            style="display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--sage); margin-top: 0.25rem;">
             <span>0 Tokens</span>
             <span id="checkout-wallet-max">Available: 500 Tokens</span>
           </div>
@@ -920,20 +1013,25 @@
             </tr>
             <tr class="total-row">
               <td>Final Payable Amount</td>
-              <td style="text-align: right; color: var(--text-primary); font-family: var(--font-heading);" id="breakdown-total-price">₹3,308</td>
+              <td style="text-align: right; color: var(--text-primary); font-family: var(--font-heading);"
+                id="breakdown-total-price">₹3,308</td>
             </tr>
           </tbody>
         </table>
 
         <!-- Token Reward Preview -->
-        <div style="background: var(--caramel-subtle); border: 1px dashed var(--caramel); border-radius: var(--radius-md); padding: 0.65rem 1rem; margin-bottom: 1.2rem; display: flex; align-items: center; justify-content: space-between;">
+        <div
+          style="background: var(--caramel-subtle); border: 1px dashed var(--caramel); border-radius: var(--radius-md); padding: 0.65rem 1rem; margin-bottom: 1.2rem; display: flex; align-items: center; justify-content: space-between;">
           <span style="font-size: 0.82rem; color: var(--text-secondary);">Eco-Tokens Awarded on Completion:</span>
-          <span style="font-family: var(--font-mono); font-weight: 800; color: var(--caramel);" id="checkout-reward-preview">+120 Tokens</span>
+          <span style="font-family: var(--font-mono); font-weight: 800; color: var(--caramel);"
+            id="checkout-reward-preview">+120 Tokens</span>
         </div>
 
         <!-- Official Razorpay Payment Gateway Information Card -->
-        <div class="razorpay-checkout-banner" style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.1rem; margin-top: 1.2rem;">
-          <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; margin-bottom: 0.8rem; flex-wrap: wrap;">
+        <div class="razorpay-checkout-banner"
+          style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.1rem; margin-top: 1.2rem;">
+          <div
+            style="display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; margin-bottom: 0.8rem; flex-wrap: wrap;">
             <div style="display: flex; align-items: center; gap: 0.6rem;">
               <span style="font-size: 1.4rem;">💳</span>
               <div>
@@ -945,36 +1043,44 @@
                 </div>
               </div>
             </div>
-            <span class="hero-pill-tag" style="background: rgba(16, 185, 129, 0.12); color: var(--emerald); border-color: rgba(16, 185, 129, 0.3);">
+            <span class="hero-pill-tag"
+              style="background: rgba(16, 185, 129, 0.12); color: var(--emerald); border-color: rgba(16, 185, 129, 0.3);">
               ⚡ Live Gateway
             </span>
           </div>
 
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.6rem; margin-bottom: 0.8rem;">
-            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 0.6rem 0.75rem;">
+          <div
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.6rem; margin-bottom: 0.8rem;">
+            <div
+              style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 0.6rem 0.75rem;">
               <div style="font-size: 1.1rem; margin-bottom: 0.2rem;">📱</div>
               <div style="font-weight: 700; font-size: 0.82rem; color: var(--text-primary);">UPI & QR Code</div>
               <div style="font-size: 0.7rem; color: var(--text-muted);">GPay, PhonePe, Paytm, BHIM</div>
             </div>
-            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 0.6rem 0.75rem;">
+            <div
+              style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 0.6rem 0.75rem;">
               <div style="font-size: 1.1rem; margin-bottom: 0.2rem;">💳</div>
               <div style="font-weight: 700; font-size: 0.82rem; color: var(--text-primary);">Cards</div>
               <div style="font-size: 0.7rem; color: var(--text-muted);">Visa, MasterCard, RuPay</div>
             </div>
-            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 0.6rem 0.75rem;">
+            <div
+              style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 0.6rem 0.75rem;">
               <div style="font-size: 1.1rem; margin-bottom: 0.2rem;">🏦</div>
               <div style="font-weight: 700; font-size: 0.82rem; color: var(--text-primary);">Net Banking</div>
               <div style="font-size: 0.7rem; color: var(--text-muted);">50+ Scheduled Banks</div>
             </div>
-            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 0.6rem 0.75rem;">
+            <div
+              style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 0.6rem 0.75rem;">
               <div style="font-size: 1.1rem; margin-bottom: 0.2rem;">👛</div>
               <div style="font-weight: 700; font-size: 0.82rem; color: var(--text-primary);">Wallets & EMI</div>
               <div style="font-size: 0.7rem; color: var(--text-muted);">Airtel, MobiKwik, PayLater</div>
             </div>
           </div>
 
-          <div style="font-size: 0.76rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; padding-top: 0.6rem; border-top: 1px solid var(--border-subtle);">
-            <span>🛡️</span> Clicking "Pay with Razorpay" will launch the official Razorpay Checkout modal for authentic payment processing.
+          <div
+            style="font-size: 0.76rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; padding-top: 0.6rem; border-top: 1px solid var(--border-subtle);">
+            <span>🛡️</span> Clicking "Pay with Razorpay" will launch the official Razorpay Checkout modal for authentic
+            payment processing.
           </div>
         </div>
 
@@ -983,7 +1089,8 @@
           <button class="filter-chip-btn" id="btn-cancel-checkout" style="padding: 0.85rem 1.4rem;" type="button">
             Cancel
           </button>
-          <button class="btn-emerald-action" id="btn-trigger-payment-flow" style="flex: 1; justify-content: center; padding: 0.95rem; font-size: 1rem;" type="button">
+          <button class="btn-emerald-action" id="btn-trigger-payment-flow"
+            style="flex: 1; justify-content: center; padding: 0.95rem; font-size: 1rem;" type="button">
             <span>🔒</span> <span id="btn-pay-text-label">Pay ₹3,308 with Razorpay</span>
           </button>
         </div>
@@ -1003,11 +1110,13 @@
         <div class="receipt-card-box">
           <div class="receipt-data-row">
             <span style="color: var(--text-muted);">Razorpay Payment ID</span>
-            <span style="font-family: var(--font-mono); font-weight: 700; color: var(--sage);" id="receipt-txn-id">pay_rzp_live_xxx</span>
+            <span style="font-family: var(--font-mono); font-weight: 700; color: var(--sage);"
+              id="receipt-txn-id">pay_rzp_live_xxx</span>
           </div>
           <div class="receipt-data-row">
             <span style="color: var(--text-muted);">Razorpay Order ID</span>
-            <span style="font-family: var(--font-mono); font-weight: 700; color: var(--emerald);" id="receipt-order-id">order_xxx</span>
+            <span style="font-family: var(--font-mono); font-weight: 700; color: var(--emerald);"
+              id="receipt-order-id">order_xxx</span>
           </div>
           <div class="receipt-data-row">
             <span style="color: var(--text-muted);">Date & Time</span>
@@ -1027,16 +1136,19 @@
           </div>
           <div class="receipt-data-row">
             <span style="font-size: 1rem; color: var(--text-primary);">Total Amount Paid</span>
-            <span style="font-size: 1.25rem; color: var(--emerald); font-family: var(--font-heading);" id="receipt-total-paid">₹3,308</span>
+            <span style="font-size: 1.25rem; color: var(--emerald); font-family: var(--font-heading);"
+              id="receipt-total-paid">₹3,308</span>
           </div>
         </div>
 
         <!-- Receipt Actions -->
         <div class="receipt-actions-grid">
-          <button class="filter-chip-btn" id="btn-download-receipt" style="flex: 1; justify-content: center; padding: 0.85rem;" type="button">
+          <button class="filter-chip-btn" id="btn-download-receipt"
+            style="flex: 1; justify-content: center; padding: 0.85rem;" type="button">
             <span>📄</span> Download Tax Invoice / Receipt
           </button>
-          <button class="btn-emerald-action" id="btn-success-view-bookings" style="flex: 1; justify-content: center; padding: 0.85rem;" type="button">
+          <button class="btn-emerald-action" id="btn-success-view-bookings"
+            style="flex: 1; justify-content: center; padding: 0.85rem;" type="button">
             <span>👤</span> View in My Bookings
           </button>
         </div>
@@ -1048,11 +1160,13 @@
        GLOBAL MODAL: AVATAR CUSTOMIZATION & PHOTO UPLOADER
   ======================================================== -->
   <div class="modal-overlay" id="modal-avatar-picker">
-    <div class="modal-content-box" style="max-width: 600px;" role="dialog" aria-modal="true" aria-labelledby="avatar-modal-title">
+    <div class="modal-content-box" style="max-width: 600px;" role="dialog" aria-modal="true"
+      aria-labelledby="avatar-modal-title">
       <button class="modal-close-x" id="modal-avatar-close" aria-label="Close modal">×</button>
 
       <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem;">
-        <span class="hero-pill-tag" style="background: var(--sage-subtle); color: var(--sage); border-color: var(--sage);">
+        <span class="hero-pill-tag"
+          style="background: var(--sage-subtle); color: var(--sage); border-color: var(--sage);">
           PROFILE CUSTOMIZATION
         </span>
       </div>
@@ -1078,54 +1192,88 @@
 
       <!-- Preset Travel Avatars Grid -->
       <div style="margin-bottom: 0.4rem;">
-        <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Or Choose a Travel Persona</label>
+        <label
+          style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Or
+          Choose a Travel Persona</label>
       </div>
 
       <div class="preset-avatars-grid" id="preset-avatars-grid">
-        <div class="preset-avatar-card selected-preset" data-avatar="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80" data-name="Mountain Trekker">
-          <img class="preset-avatar-img" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80" alt="Mountain Trekker">
+        <div class="preset-avatar-card selected-preset"
+          data-avatar="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80"
+          data-name="Mountain Trekker">
+          <img class="preset-avatar-img"
+            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80"
+            alt="Mountain Trekker">
           <span class="preset-avatar-name">Mountain Trekker</span>
           <span class="preset-avatar-tag">Highlands</span>
         </div>
 
-        <div class="preset-avatar-card" data-avatar="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" data-name="Heritage Explorer">
-          <img class="preset-avatar-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" alt="Heritage Explorer">
+        <div class="preset-avatar-card"
+          data-avatar="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80"
+          data-name="Heritage Explorer">
+          <img class="preset-avatar-img"
+            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80"
+            alt="Heritage Explorer">
           <span class="preset-avatar-name">Heritage Explorer</span>
           <span class="preset-avatar-tag">Culture</span>
         </div>
 
-        <div class="preset-avatar-card" data-avatar="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80" data-name="Forest Backpacker">
-          <img class="preset-avatar-img" src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80" alt="Forest Backpacker">
+        <div class="preset-avatar-card"
+          data-avatar="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80"
+          data-name="Forest Backpacker">
+          <img class="preset-avatar-img"
+            src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80"
+            alt="Forest Backpacker">
           <span class="preset-avatar-name">Forest Backpacker</span>
           <span class="preset-avatar-tag">Eco-Camper</span>
         </div>
 
-        <div class="preset-avatar-card" data-avatar="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=200&q=80" data-name="Solo Nomad">
-          <img class="preset-avatar-img" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=200&q=80" alt="Solo Nomad">
+        <div class="preset-avatar-card"
+          data-avatar="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=200&q=80"
+          data-name="Solo Nomad">
+          <img class="preset-avatar-img"
+            src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=200&q=80"
+            alt="Solo Nomad">
           <span class="preset-avatar-name">Solo Nomad</span>
           <span class="preset-avatar-tag">Expeditions</span>
         </div>
 
-        <div class="preset-avatar-card" data-avatar="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&q=80" data-name="Cultural Guide">
-          <img class="preset-avatar-img" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&q=80" alt="Cultural Guide">
+        <div class="preset-avatar-card"
+          data-avatar="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&q=80"
+          data-name="Cultural Guide">
+          <img class="preset-avatar-img"
+            src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&q=80"
+            alt="Cultural Guide">
           <span class="preset-avatar-name">Cultural Guide</span>
           <span class="preset-avatar-tag">Storyteller</span>
         </div>
 
-        <div class="preset-avatar-card" data-avatar="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=200&q=80" data-name="Wildlife Naturalist">
-          <img class="preset-avatar-img" src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=200&q=80" alt="Wildlife Naturalist">
+        <div class="preset-avatar-card"
+          data-avatar="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=200&q=80"
+          data-name="Wildlife Naturalist">
+          <img class="preset-avatar-img"
+            src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=200&q=80"
+            alt="Wildlife Naturalist">
           <span class="preset-avatar-name">Wildlife Naturalist</span>
           <span class="preset-avatar-tag">Biosphere</span>
         </div>
 
-        <div class="preset-avatar-card" data-avatar="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80" data-name="River Explorer">
-          <img class="preset-avatar-img" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80" alt="River Explorer">
+        <div class="preset-avatar-card"
+          data-avatar="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80"
+          data-name="River Explorer">
+          <img class="preset-avatar-img"
+            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80"
+            alt="River Explorer">
           <span class="preset-avatar-name">River Explorer</span>
           <span class="preset-avatar-tag">Kayaker</span>
         </div>
 
-        <div class="preset-avatar-card" data-avatar="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80" data-name="Himalayan Yogi">
-          <img class="preset-avatar-img" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80" alt="Himalayan Yogi">
+        <div class="preset-avatar-card"
+          data-avatar="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80"
+          data-name="Himalayan Yogi">
+          <img class="preset-avatar-img"
+            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80"
+            alt="Himalayan Yogi">
           <span class="preset-avatar-name">Himalayan Yogi</span>
           <span class="preset-avatar-tag">Wellness</span>
         </div>
@@ -1135,7 +1283,8 @@
         <button class="filter-chip-btn" id="btn-cancel-avatar-picker" style="padding: 0.85rem 1.2rem;" type="button">
           Cancel
         </button>
-        <button class="btn-emerald-action" id="btn-save-avatar-choice" style="flex: 1; justify-content: center; padding: 0.85rem;" type="button">
+        <button class="btn-emerald-action" id="btn-save-avatar-choice"
+          style="flex: 1; justify-content: center; padding: 0.85rem;" type="button">
           ✓ Save Avatar & Sync Navbar
         </button>
       </div>
@@ -1146,26 +1295,33 @@
        GLOBAL MODAL: DANGER ZONE - ACCOUNT DELETION CONFIRMATION
   ======================================================== -->
   <div class="modal-overlay" id="modal-delete-account">
-    <div class="modal-content-box" style="max-width: 520px; border-color: rgba(239, 68, 68, 0.5);" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+    <div class="modal-content-box" style="max-width: 520px; border-color: rgba(239, 68, 68, 0.5);" role="dialog"
+      aria-modal="true" aria-labelledby="delete-modal-title">
       <button class="modal-close-x" id="modal-delete-close" aria-label="Close modal">×</button>
 
-      <div style="width: 64px; height: 64px; margin: 0 auto 1.2rem auto; border-radius: var(--radius-full); background: rgba(185, 28, 28, 0.18); border: 2px solid #B91C1C; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+      <div
+        style="width: 64px; height: 64px; margin: 0 auto 1.2rem auto; border-radius: var(--radius-full); background: rgba(185, 28, 28, 0.18); border: 2px solid #B91C1C; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
         ⚠️
       </div>
 
-      <h3 id="delete-modal-title" style="font-size: 1.45rem; font-weight: 800; color: #FCA5A5; text-align: center; margin-bottom: 0.6rem;">
+      <h3 id="delete-modal-title"
+        style="font-size: 1.45rem; font-weight: 800; color: #FCA5A5; text-align: center; margin-bottom: 0.6rem;">
         Delete SafarSetu Account?
       </h3>
 
-      <div style="background: rgba(185, 28, 28, 0.1); border: 1px solid rgba(185, 28, 28, 0.3); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.4rem; font-size: 0.88rem; line-height: 1.5; color: #FEE2E2;">
-        <strong>Warning:</strong> Are you sure you want to delete your SafarSetu account? All active bookings, saved itineraries, and Eco-Tokens will be permanently erased. This action cannot be reversed.
+      <div
+        style="background: rgba(185, 28, 28, 0.1); border: 1px solid rgba(185, 28, 28, 0.3); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.4rem; font-size: 0.88rem; line-height: 1.5; color: #FEE2E2;">
+        <strong>Warning:</strong> Are you sure you want to delete your SafarSetu account? All active bookings, saved
+        itineraries, and Eco-Tokens will be permanently erased. This action cannot be reversed.
       </div>
 
       <div style="display: flex; gap: 0.8rem;">
-        <button class="filter-chip-btn" id="btn-cancel-delete-account" style="flex: 1; justify-content: center; padding: 0.85rem;" type="button">
+        <button class="filter-chip-btn" id="btn-cancel-delete-account"
+          style="flex: 1; justify-content: center; padding: 0.85rem;" type="button">
           Cancel, Keep Account
         </button>
-        <button class="btn-danger-wipe" id="btn-confirm-delete-account" style="flex: 1; justify-content: center; padding: 0.85rem;" type="button">
+        <button class="btn-danger-wipe" id="btn-confirm-delete-account"
+          style="flex: 1; justify-content: center; padding: 0.85rem;" type="button">
           🗑️ Yes, Wipe & Delete
         </button>
       </div>
@@ -1177,14 +1333,17 @@
        GLOBAL MODAL 2: GI TAG QR AUTHENTICITY CERTIFICATE MODAL
   ======================================================== -->
   <div class="modal-overlay" id="modal-gi-verify">
-    <div class="modal-content-box" style="text-align: center;" role="dialog" aria-modal="true" aria-labelledby="gi-modal-title">
+    <div class="modal-content-box" style="text-align: center;" role="dialog" aria-modal="true"
+      aria-labelledby="gi-modal-title">
       <button class="modal-close-x" id="modal-gi-close" aria-label="Close modal">×</button>
 
-      <div style="width: 70px; height: 70px; margin: 0 auto 1rem auto; background: var(--sage-subtle); border: 2px solid var(--sage); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+      <div
+        style="width: 70px; height: 70px; margin: 0 auto 1rem auto; background: var(--sage-subtle); border: 2px solid var(--sage); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-size: 2rem;">
         🛡️
       </div>
 
-      <span class="hero-pill-tag" style="background: var(--sage-subtle); color: var(--sage); border-color: var(--sage);">
+      <span class="hero-pill-tag"
+        style="background: var(--sage-subtle); color: var(--sage); border-color: var(--sage);">
         AUTHENTICATED GEOGRAPHICAL INDICATION
       </span>
 
@@ -1196,14 +1355,22 @@
       </p>
 
       <!-- QR Code Visual -->
-      <div style="background: #ffffff; padding: 1.2rem; border-radius: var(--radius-lg); width: 190px; margin: 1.4rem auto; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=GI-IN-46-KULLU-SHAWL-VERIFIED-AUTH-09873" alt="GI Tag QR Code" style="width: 100%; height: 100%; display: block;" id="gi-modal-qr-img">
+      <div
+        style="background: #ffffff; padding: 1.2rem; border-radius: var(--radius-lg); width: 190px; margin: 1.4rem auto; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+        <img
+          src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=GI-IN-46-KULLU-SHAWL-VERIFIED-AUTH-09873"
+          alt="GI Tag QR Code" style="width: 100%; height: 100%; display: block;" id="gi-modal-qr-img">
       </div>
 
-      <div style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1rem; text-align: left; font-size: 0.85rem; line-height: 1.5; margin-bottom: 1.5rem;">
-        <div style="margin-bottom: 0.4rem;"><strong>Artisan Cooperative:</strong> <span id="gi-modal-artisan">Smt. Kamala Devi & Bhutti Weavers</span></div>
-        <div style="margin-bottom: 0.4rem;"><strong>Batch Registration:</strong> <span id="gi-modal-batch" style="font-family: var(--font-mono); color: var(--sage);">KL-2026-B88</span></div>
-        <div><strong>Provenance Certification:</strong> <span id="gi-modal-proof" style="color: var(--text-secondary);">Certified hand-spun local Angora and Merino wool, woven on traditional frame pit-looms.</span></div>
+      <div
+        style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1rem; text-align: left; font-size: 0.85rem; line-height: 1.5; margin-bottom: 1.5rem;">
+        <div style="margin-bottom: 0.4rem;"><strong>Artisan Cooperative:</strong> <span id="gi-modal-artisan">Smt.
+            Kamala Devi & Bhutti Weavers</span></div>
+        <div style="margin-bottom: 0.4rem;"><strong>Batch Registration:</strong> <span id="gi-modal-batch"
+            style="font-family: var(--font-mono); color: var(--sage);">KL-2026-B88</span></div>
+        <div><strong>Provenance Certification:</strong> <span id="gi-modal-proof"
+            style="color: var(--text-secondary);">Certified hand-spun local Angora and Merino wool, woven on traditional
+            frame pit-looms.</span></div>
       </div>
 
       <button class="btn-emerald-action" id="gi-modal-done-btn" style="width: 100%; justify-content: center;">
@@ -1231,24 +1398,32 @@
         </div>
       </div>
 
-      <div style="background: rgba(185, 28, 28, 0.15); border: 1px solid #B91C1C; border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.2rem; font-size: 0.88rem; color: #FEE2E2;">
-        <strong>Live Mountain Status:</strong> Landslide clearance teams deployed along Rohtang NH-3 pass. Do NOT attempt night transit.
+      <div
+        style="background: rgba(185, 28, 28, 0.15); border: 1px solid #B91C1C; border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.2rem; font-size: 0.88rem; color: #FEE2E2;">
+        <strong>Live Mountain Status:</strong> Landslide clearance teams deployed along Rohtang NH-3 pass. Do NOT
+        attempt night transit.
       </div>
 
       <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem;">
-        <div style="background: var(--bg-secondary); padding: 0.85rem 1rem; border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center;">
+        <div
+          style="background: var(--bg-secondary); padding: 0.85rem 1rem; border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center;">
           <div>
             <div style="font-weight: 700; font-size: 0.9rem;">National Disaster Management (NDMA)</div>
             <div style="font-size: 0.78rem; color: var(--text-muted);">24/7 Toll-Free Mountain Rescue Helpline</div>
           </div>
-          <a href="tel:1078" style="background: #B91C1C; color: #fff; padding: 0.4rem 0.9rem; border-radius: var(--radius-full); font-weight: 800; font-size: 0.85rem;">📞 Call 1078</a>
+          <a href="tel:1078"
+            style="background: #B91C1C; color: #fff; padding: 0.4rem 0.9rem; border-radius: var(--radius-full); font-weight: 800; font-size: 0.85rem;">📞
+            Call 1078</a>
         </div>
-        <div style="background: var(--bg-secondary); padding: 0.85rem 1rem; border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center;">
+        <div
+          style="background: var(--bg-secondary); padding: 0.85rem 1rem; border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center;">
           <div>
             <div style="font-weight: 700; font-size: 0.9rem;">State Emergency Operations Centre</div>
             <div style="font-size: 0.78rem; color: var(--text-muted);">Himachal / Uttarakhand Disaster Desk</div>
           </div>
-          <a href="tel:1070" style="background: rgba(255,255,255,0.1); color: #fff; padding: 0.4rem 0.9rem; border-radius: var(--radius-full); font-weight: 800; font-size: 0.85rem;">📞 Call 1070</a>
+          <a href="tel:1070"
+            style="background: rgba(255,255,255,0.1); color: #fff; padding: 0.4rem 0.9rem; border-radius: var(--radius-full); font-weight: 800; font-size: 0.85rem;">📞
+            Call 1070</a>
         </div>
       </div>
 
@@ -1265,4 +1440,5 @@
   <script src="data.js"></script>
   <script src="app.js"></script>
 </body>
+
 </html>
